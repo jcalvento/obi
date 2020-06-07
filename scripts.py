@@ -124,3 +124,12 @@ if __name__ == '__main__':
 
         lookup_responses.append(lookup_response.json())
     lookup_responses
+
+    # Los que no se puedan mapear
+    from Bio import Entrez
+    Entrez.email = 'juliancalvento@gmail.com'
+    entrez_response = Entrez.esearch(db="gene", term="NM_001319355", retmax='200')
+    # Entrez.esummary(db="nucleotide", id=985481999, report="full")
+    fetch_response = Entrez.efetch(db="nucleotide", id=985481999, rettype="gb", retmode="xml")
+    # del fetch response[0] sacar 'GBSeq_feature-table', y de la parte de CDS 'GBFeature_location', después cortar la secuencia desde inicio - 1 al fin
+    # La secuencia está en 'GBSeq_sequence'
