@@ -1,0 +1,28 @@
+Para saber las bases disponibles en el directorio
+blastdbcmd -list ./swissprot/
+
+Para traer info de una base
+blastdbcmd -info -db ./swissprot/swissprot
+
+https://www.ncbi.nlm.nih.gov/books/NBK279689/
+
+https://ftp.ncbi.nlm.nih.gov/blast/documents/blastdb.html
+
+https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastDocs&DOC_TYPE=Download
+
+https://www.ncbi.nlm.nih.gov/books/NBK279671/#introduction.MacOSX
+
+https://www.ncbi.nlm.nih.gov/books/NBK52640/
+
+Salió error No alias or index file found for nucleotide database [nt] in search path
+http://seqanswers.com/forums/showthread.php?t=44370
+
+De los mapeados no encuentra
+O35090
+P19121
+
+Mando a Entrez
+['213', '100174145', '102130757', '448843', '403550', '101837229', '100009195', '24186', '11657']
+
+pero vuelven solo
+['gi|213', 'gi|100174145', 'gi|102130757', 'gi|403550', 'gi|101837229', 'gi|100009195', 'gi|24186']

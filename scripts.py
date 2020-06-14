@@ -1,3 +1,4 @@
+import os
 import subprocess
 from io import StringIO
 
@@ -72,9 +73,10 @@ if __name__ == '__main__':
     #     "blastp", "swissprot", protein_chain, word_size=6,
     #     threshold=10, matrix_name="BLOSUM62", gapcosts="11 1"
     # )
-    with open("blast_result.xml", "r") as f:
-        file = f.read()
-    scan_result = StringIO(file)
+    # with open("blast_result.xml", "r") as f:
+    #     file = f.read()
+    # scan_result = StringIO(file)
+    scan_result = os.popen('blastp -query ./query.fasta -db ../swissprot/swissprot -outfmt 5')
     blast_records = NCBIXML.read(scan_result)
 
     # Mejores hits segun criterio
@@ -104,32 +106,35 @@ if __name__ == '__main__':
         url='https://www.uniprot.org/uploadlists/',
         data={
             'from': 'ACC+ID',
-            'to': 'ENSEMBL_ID',
+            'to': 'P_ENTREZGENEID',
             'format': 'tab',
             'query': " ".join(uniprot_ids)
         }
     )
 
-    uniprot_to_ensembl = []
+    uniprot_to_entrez = []
     for result_line in uniprot_response.text.split("\n")[1:-1]:
-        uniprot_to_ensembl.append({"uniprot_id": result_line.split("\t")[0], "ensembl_id": result_line.split("\t")[1]})
+        uniprot_to_entrez.append({"uniprot_id": result_line.split("\t")[0], "entrez_id": result_line.split("\t")[1]})
+    #
+    # # Lookup en Ensembl
+    # lookup_responses = []
+    # for uniprot_mapping in uniprot_to_ensembl:
+    #     lookup_response = requests.get(
+    #         url=f"https://rest.ensembl.org/lookup/id/{uniprot_mapping['ensembl_id']}?expand=1",
+    #         headers={"Content-type": "application/json"}
+    #     )
+    #
+    #     lookup_responses.append(lookup_response.json())
+    # lookup_responses
 
-    # Lookup en Ensembl
-    lookup_responses = []
-    for uniprot_mapping in uniprot_to_ensembl:
-        lookup_response = requests.get(
-            url=f"https://rest.ensembl.org/lookup/id/{uniprot_mapping['ensembl_id']}?expand=1",
-            headers={"Content-type": "application/json"}
-        )
-
-        lookup_responses.append(lookup_response.json())
-    lookup_responses
-
-    # Los que no se puedan mapear
+    # # Los que no se puedan mapear
     from Bio import Entrez
     Entrez.email = 'juliancalvento@gmail.com'
-    entrez_response = Entrez.esearch(db="gene", term="NM_001319355", retmax='200')
+    # entrez_response = Entrez.esearch(db="gene", term='NM_000477.6', retmax='200')
     # Entrez.esummary(db="nucleotide", id=985481999, report="full")
-    fetch_response = Entrez.efetch(db="nucleotide", id=985481999, rettype="gb", retmode="xml")
-    # del fetch response[0] sacar 'GBSeq_feature-table', y de la parte de CDS 'GBFeature_location', después cortar la secuencia desde inicio - 1 al fin
-    # La secuencia está en 'GBSeq_sequence'
+    entrez_ids = list(map(lambda entrez_dict: entrez_dict['entrez_id'], uniprot_to_entrez))
+    fetch_response = Entrez.efetch(db="nucleotide", id=entrez_ids, rettype="gb", retmode="xml")
+    parsed_response = Entrez.read(fetch_response)
+    parsed_response
+    # # del fetch response[0] sacar 'GBSeq_feature-table', y de la parte de CDS 'GBFeature_location', después cortar la secuencia desde inicio - 1 al fin
+    # # La secuencia está en 'GBSeq_sequence'
