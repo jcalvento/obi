@@ -1,16 +1,9 @@
 import os
 import subprocess
-from io import StringIO
 
 import requests
-from Bio.Blast import NCBIXML, NCBIWWW
-
-
-def perform_request(path):
-    return requests.get(
-        url=f"https://rest.ensembl.org/{path}",
-        headers={"Content-type": "text/x-fasta"}
-    ).text
+from Bio import Entrez
+from Bio.Blast import NCBIXML
 
 
 def most_similar_between(alignment, another_alignment):
@@ -66,39 +59,32 @@ def make_fasta(alignments):
     return fasta_file.name
 
 
-if __name__ == '__main__':
+def blast(input_fasta, db_path):
     # Blast
-    protein_chain = 'MKWVTFISLLFLFSSAYSRGVFRRDAHKSEVAHRFKDLGEENFKALVLIAFAQYLQQCPFEDHVKLVNEVTEFAKTCVADESAENCDKSLHTLFGDKLCTVATLRETYGEMADCCAKQEPERNECFLQHKDDNPNLPRLVRPEVDVMCTAFHDNEETFLKKYLYEIARRHPYFYAPELLFFAKRYKAAFTECCQAADKAACLLPKLDELRDEGKASSAKQRLKCASLQKFGERAFKAWAVARLSQRFPKAEFAEVSKLVTDLTKVHTECCHGDLLECADDRADLAKYICENQDSISSKLKECCEKPLLEKSHCIAEVENDEMPADLPSLAADFVESKDVCKNYAEAKDVFLGMFLYEYARRHPDYSVVLLLRLAKTYETTLEKCCAAADPHECYAKVFDEFKPLVEEPQNLIKQNCELFKQLGEYKFQNALLVRYTKKVPQVSTPTLVEVSRNLGKVGSKCCKHPEAKRMPCAEDYLSVVLNQLCVLHEKTPVSDRVTKCCTESLVNRRPCFSALEVDETYVPKEFNAETFTFHADICTLSEKERQIKKQTALVELVKHKPKATKEQLKAVMDDFAAFVEKCCKADDKETCFAEEGKKLVAASQAALGL'
-    # scan_result = NCBIWWW.qblast(
-    #     "blastp", "swissprot", protein_chain, word_size=6,
-    #     threshold=10, matrix_name="BLOSUM62", gapcosts="11 1"
-    # )
-    # with open("blast_result.xml", "r") as f:
-    #     file = f.read()
-    # scan_result = StringIO(file)
-    scan_result = os.popen('blastp -query ./query.fasta -db ../swissprot/swissprot -outfmt 5')
-    blast_records = NCBIXML.read(scan_result)
+    blast_result = os.popen(f'blastp -query {input_fasta} -db {db_path} -outfmt 5')
+    blast_records = NCBIXML.read(blast_result)
+
+    sequence = []
+    with open(input_fasta, "r") as f:
+        for line in f.readlines():
+            if not line.startswith(">"):
+                sequence.append(line)
+    protein_chain = "".join(sequence).replace("\n", "")
 
     # Mejores hits segun criterio
-    filtered_records = list(filter(
+    filtered_results = list(filter(
         lambda alignment: meets_expected_criteria(protein_chain, alignment), blast_records.alignments
     ))
 
     # Crear Fasta con hits
-    fasta_file = make_fasta(filtered_records)
+    return make_fasta(filtered_results)
 
-    # Clustering con cd-hit
-    cd_hit_output_file = 'clust100_' + fasta_file
-    subprocess.call(['./../cdhit/cd-hit', '-i', fasta_file, '-o', cd_hit_output_file, '-c', '1'])
 
-    # Alineamiento con Clustal Omega
-    clustal_output = "clustalo_aligned.fasta"
-    subprocess.call(['clustalo', '-i', cd_hit_output_file, '-o', clustal_output, "--force"])
-
-    # Mappeo de Uniprot a Ensembl
+def map_uniprot_ids_to_entrez_ids(fasta_file):
+    # Mappeo de Uniprot a Entrez
     uniprot_ids = []
-    with open(clustal_output, "r") as clustal_file:
-        for line in clustal_file.readlines():
+    with open(fasta_file, "r") as f:
+        for line in f.readlines():
             if line.startswith(">"):
                 uniprot_ids.append(line.split(" ")[0].replace(">", ""))
 
@@ -112,29 +98,43 @@ if __name__ == '__main__':
         }
     )
 
-    uniprot_to_entrez = []
-    for result_line in uniprot_response.text.split("\n")[1:-1]:
-        uniprot_to_entrez.append({"uniprot_id": result_line.split("\t")[0], "entrez_id": result_line.split("\t")[1]})
-    #
-    # # Lookup en Ensembl
-    # lookup_responses = []
-    # for uniprot_mapping in uniprot_to_ensembl:
-    #     lookup_response = requests.get(
-    #         url=f"https://rest.ensembl.org/lookup/id/{uniprot_mapping['ensembl_id']}?expand=1",
-    #         headers={"Content-type": "application/json"}
-    #     )
-    #
-    #     lookup_responses.append(lookup_response.json())
-    # lookup_responses
+    assert uniprot_response.status_code == requests.status_codes.codes.ok
 
-    # # Los que no se puedan mapear
-    from Bio import Entrez
+    return list(map(
+        lambda result_line: {"uniprot_id": result_line.split("\t")[0], "entrez_id": result_line.split("\t")[1]},
+        uniprot_response.text.split("\n")[1:-1]
+    ))
+
+
+def cd_hit(input_fasta):
+    cd_hit_output_file = 'clust100_' + input_fasta
+    subprocess.call(['./../cdhit/cd-hit', '-i', input_fasta, '-o', cd_hit_output_file, '-c', '1'])
+
+    return cd_hit_output_file
+
+
+def clustal(input_fasta):
+    clustal_output = "clustalo_aligned.fasta"
+    subprocess.call(['clustalo', '-i', input_fasta, '-o', clustal_output, "--force"])
+
+    return clustal_output
+
+
+def fetch_cds_from_entrez(ids):
     Entrez.email = 'juliancalvento@gmail.com'
-    # entrez_response = Entrez.esearch(db="gene", term='NM_000477.6', retmax='200')
-    # Entrez.esummary(db="nucleotide", id=985481999, report="full")
-    entrez_ids = list(map(lambda entrez_dict: entrez_dict['entrez_id'], uniprot_to_entrez))
+    entrez_ids = list(map(lambda entrez_dict: entrez_dict['entrez_id'], ids))
     fetch_response = Entrez.efetch(db="nucleotide", id=entrez_ids, rettype="gb", retmode="xml")
     parsed_response = Entrez.read(fetch_response)
-    parsed_response
     # # del fetch response[0] sacar 'GBSeq_feature-table', y de la parte de CDS 'GBFeature_location', después cortar la secuencia desde inicio - 1 al fin
     # # La secuencia está en 'GBSeq_sequence'
+    return parsed_response
+
+
+if __name__ == '__main__':
+    fasta_file = blast('./query.fasta', '../swissprot/swissprot')
+
+    # Checkpoint
+    cd_hit_output_file = cd_hit(fasta_file)
+    clustal_output = clustal(cd_hit_output_file)
+    uniprot_to_entrez = map_uniprot_ids_to_entrez_ids(clustal_output)
+    fetch_cds_from_entrez(uniprot_to_entrez)
