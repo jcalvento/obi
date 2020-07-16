@@ -65,15 +65,10 @@ class Blast:
     # coverage > 90% ((dfblst['q.end']-dfblst['q.start'])/query_length)*100.0
     # evalue < 0.005
 
-    def __fasta_info(self, alignment):
-        accession = alignment.hit_id.split('|')[1]
-        blastdbcmd_result = os.popen(f'blastdbcmd -db {self._db_path} -entry {accession}')
-
-        return blastdbcmd_result.read()
-
     def __make_fasta(self, filename, alignments):
-        content = "\n\n".join(list(map(lambda alignment: self.__fasta_info(alignment), alignments)))
+        ids = ",".join(list(map(lambda alignment: alignment.hit_id.split('|')[1], alignments)))
+        blastdbcmd_result = os.popen(f'blastdbcmd -db {self._db_path} -entry {ids}').read()
         fasta_file = open(f"results/{filename}_blast_result.fasta", "w")
-        fasta_file.write(content)
+        fasta_file.write(blastdbcmd_result)
         fasta_file.close()
         return fasta_file.name
