@@ -14,10 +14,13 @@ class BlastResultsError(RuntimeError):
 
 
 class Blast:
-    def run(self, input_fasta, db_path):
+    def __init__(self, db_path):
+        self._db_path = db_path
+
+    def run(self, input_fasta):
         # Blast
         try:
-            blast_result = os.popen(f'blastp -query {input_fasta} -db {db_path} -outfmt 5')
+            blast_result = os.popen(f'blastp -query {input_fasta} -db {self._db_path} -outfmt 5')
             blast_records = NCBIXML.read(blast_result)
         except ValueError:
             raise EmptyBlastResultError(f"Couldn't find any blast result for file {input_fasta}")
@@ -64,13 +67,9 @@ class Blast:
 
     def __fasta_info(self, alignment):
         accession = alignment.hit_id.split('|')[1]
-        gen_name = alignment.hit_def.split(';')[0].split('RecName: Full=')[-1]
-        raw_species = alignment.hit_def.split(';')[-1]
-        species = raw_species[raw_species.find("[") + 1:raw_species.find("]")]
-        header = f">{accession} {species}, gene for {gen_name}"
-        sequence = alignment.hsps[0].sbjct
+        blastdbcmd_result = os.popen(f'blastdbcmd -db {self._db_path} -entry {accession}')
 
-        return f"{header}\n{sequence}"
+        return blastdbcmd_result.read()
 
     def __make_fasta(self, filename, alignments):
         content = "\n\n".join(list(map(lambda alignment: self.__fasta_info(alignment), alignments)))
