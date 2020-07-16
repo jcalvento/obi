@@ -1,7 +1,6 @@
-import csv
+import datetime
 import os
 import subprocess
-import datetime
 import urllib
 
 import requests
@@ -27,7 +26,7 @@ def map_uniprot_ids_to_entrez_ids(fasta_file):
         url='https://www.uniprot.org/uploadlists/',
         data={
             'from': 'ACC+ID',
-            'to': 'P_ENTREZGENEID',
+            'to': 'REFSEQ_NT_ID',
             'format': 'tab',
             'query': " ".join(uniprot_ids)
         }
@@ -55,6 +54,15 @@ def clustal(input_fasta):
     return clustal_output
 
 
+def uniprot_id(sequence_ids, ids):
+    entrez_id = next((x for x in sequence_ids if x.startswith('ref|')), None).replace('ref|', '').replace('|', '')
+    return next((ids_map['uniprot_id'] for ids_map in ids if entrez_id in ids_map['entrez_id']), None)
+
+
+def cds_location(features):
+    return next((feature['GBFeature_location'] for feature in features if feature['GBFeature_key'] == 'CDS'), None)
+
+
 def fetch_cds_from_entrez(ids):
     if not ids:
         raise InvalidEntrezIds("Empty ids lists")
@@ -65,23 +73,46 @@ def fetch_cds_from_entrez(ids):
     except urllib.error.HTTPError:
         print(f"There's been an error with Entrez, ids: {entrez_ids}")
         return
-    # # del fetch response[0] sacar 'GBSeq_feature-table', y de la parte de CDS 'GBFeature_location', después cortar la secuencia desde inicio - 1 al fin
-    # # La secuencia está en 'GBSeq_sequence'
-    return entez_response
+    return list(map(lambda element: {
+        'uniprot_id': uniprot_id(element['GBSeq_other-seqids'], ids),
+        'location': cds_location(element['GBSeq_feature-table']),
+        'sequence': element['GBSeq_sequence']
+    }, entez_response))
+
+
+def protein_based_nucleotide_alignment(entrez_response, protein_alignment_path):
+    alignments = {}
+    current = None
+    with open(protein_alignment_path, "r") as f:
+        for line in f.readlines():
+            if line.startswith(">"):
+                gen_id = line.split(" ")[0].replace(">", "")
+                alignments[gen_id] = ''
+                current = gen_id
+            else:
+                alignments[current] += line.replace('\n', '')
+    nucleotide_alignments = {}
+    for entrez_row in entrez_response:
+        alignment_id = next((x for x in alignments if x.startswith(entrez_row['uniprot_id'])), None)
+        alignment = alignments[alignment_id]
+
 
 
 def alignment_preparation(fasta_file):
     cd_hit_output_file = cd_hit(fasta_file)
     uniprot_to_entrez = map_uniprot_ids_to_entrez_ids(cd_hit_output_file)
-    fetch_cds_from_entrez(uniprot_to_entrez)
-    # clustal_output = clustal(cd_hit_output_file)
+    entrez_response = fetch_cds_from_entrez(uniprot_to_entrez)
+    clustal_output = clustal(cd_hit_output_file)
+    # clustal_output = 'results/clustalo_alignedclust100_P00784_blast_result.fasta'
+    # entrez_response = [{'uniprot_id': 'O65493', 'location': '1..312', 'sequence': 'tttttttttttttttttggnatggtcagtgcattttattgaatcagcacagtacaaaaataaataaaaataagggaagggganttaaattacagccaaactgagcttcatgactttgtcagattataaaccacacatactcacaaacacactacacatacatacaaaatgagacaaatntaaattaatnttaacantacccacagtttgggtcaaaggattagnctacaggaaggaanttgcactaaaaanccaacatacatcacacgngtgtanttgggcgtttcaaatttacaggctntggattanttct'}, {'uniprot_id': 'Q9LM66', 'location': '1..470', 'sequence': 'cttctgtgtaggtgaccggagcactgagaggcagctctgatgcactattgtgtgtcagcagctcaaaggccctaaaacactgaaggttctgcatctgaagtattagattgttagcagcaaaatatgaaagatgaggtggacagtcctctaagccctatttagggaagcttttccaagccacaatcttaactacctacccaaaggatttgcattacccccagattctgtgccaacaaccttttaaggaaatacagtccttgggaaatgagttttgatggtgaattggggtgttaaggaagggaaagattgtcatagatggtagggctttgaaaaatgcagggtattcagcttgccactcctgggctttcaacacatttgagttcacttgcctaggacgggttctcttgggtctttatttccccatnctgggcccattgctttaaatactattttgtttgaaaattaatttt'}]
+    protein_based_nucleotide_alignment(entrez_response, clustal_output)
 
 
 if __name__ == '__main__':
     files = os.listdir('./fasta')
     print(f"Whole process init time: {datetime.datetime.now()}")
     failed_count = 0
-    for file in files:
+    for file in [files[0]]:
         print(f"Init time: {datetime.datetime.now()}")
         try:
             fasta_file = Blast().run(f"fasta/{file}", '../swissprot/swissprot')
