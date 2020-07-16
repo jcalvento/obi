@@ -1,17 +1,11 @@
 import datetime
 import os
 import subprocess
-import urllib
 
 import requests
 
 from blast import Blast, EmptyBlastResultError, BlastResultsError
-from entrez_api_client import EntrezApiClient
-
-
-class InvalidEntrezIds(RuntimeError):
-    def __init__(self, message):
-        self.message = message
+from entrez import EntrezDB, InvalidEntrezIds
 
 
 def map_uniprot_ids_to_entrez_ids(fasta_file):
@@ -54,38 +48,6 @@ def clustal(input_fasta):
     return clustal_output
 
 
-def uniprot_id(sequence_ids, ids):
-    entrez_id = next((x for x in sequence_ids if x.startswith('ref|')), None).replace('ref|', '').replace('|', '')
-    return next((ids_map['uniprot_id'] for ids_map in ids if entrez_id in ids_map['entrez_id']), None)
-
-
-def cds_location(features):
-    return next((feature['GBFeature_location'] for feature in features if feature['GBFeature_key'] == 'CDS'), None)
-
-
-def entrez_translation(features):
-    feature_qualifiers = next((feature['GBFeature_quals'] for feature in features if feature['GBFeature_key'] == 'CDS'), None)
-    return next((qualifier['GBQualifier_value'] for qualifier in feature_qualifiers if qualifier['GBQualifier_name'] == 'translation'), None)
-
-
-def fetch_cds_from_entrez(ids):
-    if not ids:
-        raise InvalidEntrezIds("Empty ids lists")
-    entrez_ids = list(map(lambda entrez_dict: entrez_dict['entrez_id'], ids))
-    entrez_api_client = EntrezApiClient('juliancalvento@gmail.com')
-    try:
-        entrez_response = entrez_api_client.efetch(entrez_ids)
-    except urllib.error.HTTPError:
-        print(f"There's been an error with Entrez, ids: {entrez_ids}")
-        return
-    return list(map(lambda element: {
-        'uniprot_id': uniprot_id(element['GBSeq_other-seqids'], ids),
-        'location': cds_location(element['GBSeq_feature-table']),
-        'translation': entrez_translation(element['GBSeq_feature-table']),
-        'sequence': element['GBSeq_sequence']
-    }, entrez_response))
-
-
 def protein_based_nucleotide_alignment(entrez_response, protein_alignment_path):
     alignments = {}
     current = None
@@ -103,11 +65,10 @@ def protein_based_nucleotide_alignment(entrez_response, protein_alignment_path):
         alignment = alignments[alignment_id]
 
 
-
 def alignment_preparation(fasta_file):
     cd_hit_output_file = cd_hit(fasta_file)
     uniprot_to_entrez = map_uniprot_ids_to_entrez_ids(cd_hit_output_file)
-    entrez_response = fetch_cds_from_entrez(uniprot_to_entrez)
+    entrez_response = EntrezDB().fetch_cds(uniprot_to_entrez)
     clustal_output = clustal(cd_hit_output_file)
     protein_based_nucleotide_alignment(entrez_response, clustal_output)
 
