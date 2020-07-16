@@ -60,3 +60,5 @@ Esto quiere decir que hay que empezar a compararlas donde empiezan a coincidir y
 Pruebas con otras bases de entrez
 # fetch_response = Entrez.efetch(db="nuccore", id=ids, rettype="native", retmode="xml")
 # fetch_response = Entrez.efetch(db="gene", id=ids, rettype="native", retmode="xml")
+
+Preguntas: Por que no alinear la traduccion directamente con la primera del cd hit?
