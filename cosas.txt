@@ -63,3 +63,6 @@ Pruebas con otras bases de entrez
 # fetch_response = Entrez.efetch(db="gene", id=ids, rettype="native", retmode="xml")
 
 Preguntas: Por que no alinear la traduccion directamente con la primera del cd hit?
+
+https://www.ebi.ac.uk/pdbe/docs/sifts/quick.html
+Consultar uniprot api por pdb id

@@ -63,6 +63,24 @@ def protein_based_nucleotide_alignment(entrez_response, protein_alignment_path):
     for entrez_row in entrez_response:
         alignment_id = next((x for x in alignments if x.startswith(entrez_row['uniprot_id'])), None)
         alignment = alignments[alignment_id]
+        # TODO: Validar largo de la cadena con el resultado del blastcmd? Alignment podria agrega cosas al final
+        init, end = entrez_row['location'].split('..')
+        adn_sequence = entrez_row['sequence'][int(init) - 1:int(end) - 3]  # -3 removes stop codon
+        adn_codons = [adn_sequence[index:index + 3] for index in range(0, len(adn_sequence), 3)]
+        nucleotide_alignment = ''
+        codon_index = 0
+        for amino_acid in alignment:
+            if amino_acid == '-':
+                nucleotide_alignment += '---'
+            else:
+                nucleotide_alignment += adn_codons[codon_index]
+                codon_index += 1
+        nucleotide_alignments[alignment_id] = nucleotide_alignment
+
+    nucleotide_fasta = open(f"results/nucleotide_{protein_alignment_path.split('/')[1]}", "w")
+    nucleotide_fasta.write('\n'.join(list(map(lambda key: f'>{key}\n{nucleotide_alignments[key]}', nucleotide_alignments))))
+    nucleotide_fasta.close()
+    return nucleotide_fasta
 
 
 def alignment_preparation(fasta_file):
@@ -70,7 +88,11 @@ def alignment_preparation(fasta_file):
     uniprot_to_entrez = map_uniprot_ids_to_entrez_ids(cd_hit_output_file)
     entrez_response = EntrezDB().fetch_cds(uniprot_to_entrez)
     clustal_output = clustal(cd_hit_output_file)
-    protein_based_nucleotide_alignment(entrez_response, clustal_output)
+    return protein_based_nucleotide_alignment(entrez_response, clustal_output)
+
+
+def step_2(nucleotide_alignment):
+    pass
 
 
 if __name__ == '__main__':
@@ -89,7 +111,8 @@ if __name__ == '__main__':
             continue
         # Checkpoint
         try:
-            alignment_preparation(fasta_file)
+            nucleotide_alignment = alignment_preparation(fasta_file)
+            step_2(nucleotide_alignment)
         except InvalidEntrezIds:
             failed_count += 1
         print(f"Finish time: {datetime.datetime.now()}")
