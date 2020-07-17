@@ -91,8 +91,20 @@ def alignment_preparation(fasta_file):
     return protein_based_nucleotide_alignment(entrez_response, clustal_output)
 
 
-def step_2(nucleotide_alignment):
-    pass
+def generate_tree(nucleotide_alignment_path, boostrap):
+    os.popen(f'iqtree -s {nucleotide_alignment_path} -bb {boostrap}').read()
+
+    return f'{nucleotide_alignment_path}.treefile'
+
+
+def hyphy(nucleotide_alignment_path, tree_path):
+    subprocess.call(['hyphy', 'meme', '--alignment', nucleotide_alignment_path, '-bb', tree_path])
+    # os.popen(f'hyphy meme --alignment {nucleotide_alignment_path} --tree {tree_path}').read()
+
+
+def step_2(nucleotide_alignment_path, boostrap):
+    tree_path = generate_tree(nucleotide_alignment_path, boostrap)
+    hyphy(nucleotide_alignment_path, tree_path)
 
 
 if __name__ == '__main__':
@@ -112,7 +124,8 @@ if __name__ == '__main__':
         # Checkpoint
         try:
             nucleotide_alignment = alignment_preparation(fasta_file)
-            step_2(nucleotide_alignment)
+            # nucleotide_alignment = 'results/nucleotide_clustalo_alignedclust100_P00784_blast_result.fasta'
+            step_2(nucleotide_alignment, 1000)
         except InvalidEntrezIds:
             failed_count += 1
         print(f"Finish time: {datetime.datetime.now()}")
