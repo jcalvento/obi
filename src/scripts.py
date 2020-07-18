@@ -8,6 +8,7 @@ import requests
 
 from src.blast import Blast, BlastResultsError
 from src.entrez import EntrezDB, InvalidEntrezIds
+from src.nucleotide_aligner import NucleotideAligner
 
 
 def map_uniprot_ids_to_entrez_ids(fasta_file):
@@ -50,47 +51,12 @@ def clustal(input_fasta, results_dir):
     return clustal_output
 
 
-def protein_based_nucleotide_alignment(entrez_response, protein_alignment_path, results_dir):
-    alignments = {}
-    current = None
-    with open(protein_alignment_path, "r") as f:
-        for line in f.readlines():
-            if line.startswith(">"):
-                gen_id = line.split(" ")[0].replace(">", "")
-                alignments[gen_id] = ''
-                current = gen_id
-            else:
-                alignments[current] += line.replace('\n', '')
-    nucleotide_alignments = {}
-    for entrez_row in entrez_response:
-        alignment_id = next((x for x in alignments if x.startswith(entrez_row.uniprot_id)), None)
-        alignment = alignments[alignment_id]
-        # TODO: Validar largo de la cadena con el resultado del blastcmd? Alignment podria agrega cosas al final
-        init, end = entrez_row.location.split('..')
-        adn_sequence = entrez_row.sequence[int(init) - 1:int(end) - 3]  # -3 removes stop codon
-        adn_codons = [adn_sequence[index:index + 3] for index in range(0, len(adn_sequence), 3)]
-        nucleotide_alignment = ''
-        codon_index = 0
-        for amino_acid in alignment:
-            if amino_acid == '-':
-                nucleotide_alignment += '---'
-            else:
-                nucleotide_alignment += adn_codons[codon_index]
-                codon_index += 1
-        nucleotide_alignments[alignment_id] = nucleotide_alignment
-
-    nucleotide_fasta = open(f"{results_dir}/nucleotide_alignment.fasta", "w")
-    nucleotide_fasta.write('\n'.join(list(map(lambda key: f'>{key}\n{nucleotide_alignments[key]}', nucleotide_alignments))))
-    nucleotide_fasta.close()
-    return nucleotide_fasta.name
-
-
 def alignment_preparation(fasta_file, results_dir):
     cd_hit_output_file = cd_hit(fasta_file, results_dir)
     uniprot_to_entrez = map_uniprot_ids_to_entrez_ids(cd_hit_output_file)
     entrez_response = EntrezDB().fetch_cds(uniprot_to_entrez)
     clustal_output = clustal(cd_hit_output_file, results_dir)
-    return protein_based_nucleotide_alignment(entrez_response, clustal_output, results_dir)
+    return NucleotideAligner().protein_based_nucleotide_alignment(entrez_response, clustal_output, results_dir)
 
 
 def generate_tree(nucleotide_alignment_path, boostrap):
