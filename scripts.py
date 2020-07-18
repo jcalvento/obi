@@ -80,7 +80,7 @@ def protein_based_nucleotide_alignment(entrez_response, protein_alignment_path):
     nucleotide_fasta = open(f"results/nucleotide_{protein_alignment_path.split('/')[1]}", "w")
     nucleotide_fasta.write('\n'.join(list(map(lambda key: f'>{key}\n{nucleotide_alignments[key]}', nucleotide_alignments))))
     nucleotide_fasta.close()
-    return nucleotide_fasta
+    return nucleotide_fasta.name
 
 
 def alignment_preparation(fasta_file):
