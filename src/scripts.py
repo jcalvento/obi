@@ -136,7 +136,7 @@ if __name__ == '__main__':
             continue
         try:
             nucleotide_alignment = alignment_preparation(fasta_file, results_dir)
-            # step_2(nucleotide_alignment, 1000)
+            step_2(nucleotide_alignment, 1000)
         except InvalidEntrezIds:
             failed_count += 1
         print(f"Finish time: {datetime.datetime.now()}")
