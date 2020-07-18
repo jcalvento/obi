@@ -32,6 +32,14 @@ class EntrezApiClient:
         return Entrez.read(fetch_response)
 
 
+class EntrezElement:
+    def __init__(self, uniprot_id, location, translation, sequence):
+        self.sequence = sequence
+        self.translation = translation
+        self.location = location
+        self.uniprot_id = uniprot_id
+
+
 class EntrezDB:
     def __init__(self):
         self._entrez_api_client = EntrezApiClient('juliancalvento@gmail.com')
@@ -45,12 +53,15 @@ class EntrezDB:
         except urllib.error.HTTPError:
             print(f"There's been an error with Entrez, ids: {entrez_ids}")
             return
-        return list(map(lambda element: {
-            'uniprot_id': self.__uniprot_id(element['GBSeq_other-seqids'], ids),
-            'location': self.__cds_location(element['GBSeq_feature-table']),
-            'translation': self.__entrez_translation(element['GBSeq_feature-table']),
-            'sequence': element['GBSeq_sequence']
-        }, entrez_response))
+        return self.__parse_response(entrez_response, ids)
+
+    def __parse_response(self, entrez_response, ids):
+        return list(map(lambda element: EntrezElement(
+            uniprot_id=self.__uniprot_id(element['GBSeq_other-seqids'], ids),
+            location=self.__cds_location(element['GBSeq_feature-table']),
+            translation=self.__entrez_translation(element['GBSeq_feature-table']),
+            sequence=element['GBSeq_sequence']
+        ), entrez_response))
 
     def __uniprot_id(self, sequence_ids, ids):
         entrez_id = next((x for x in sequence_ids if x.startswith('ref|')), None).replace('ref|', '').replace('|', '')

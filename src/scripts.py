@@ -6,7 +6,7 @@ import subprocess
 
 import requests
 
-from src.blast import Blast, EmptyBlastResultError, BlastResultsError
+from src.blast import Blast, BlastResultsError
 from src.entrez import EntrezDB, InvalidEntrezIds
 
 
@@ -63,11 +63,11 @@ def protein_based_nucleotide_alignment(entrez_response, protein_alignment_path, 
                 alignments[current] += line.replace('\n', '')
     nucleotide_alignments = {}
     for entrez_row in entrez_response:
-        alignment_id = next((x for x in alignments if x.startswith(entrez_row['uniprot_id'])), None)
+        alignment_id = next((x for x in alignments if x.startswith(entrez_row.uniprot_id)), None)
         alignment = alignments[alignment_id]
         # TODO: Validar largo de la cadena con el resultado del blastcmd? Alignment podria agrega cosas al final
-        init, end = entrez_row['location'].split('..')
-        adn_sequence = entrez_row['sequence'][int(init) - 1:int(end) - 3]  # -3 removes stop codon
+        init, end = entrez_row.location.split('..')
+        adn_sequence = entrez_row.sequence[int(init) - 1:int(end) - 3]  # -3 removes stop codon
         adn_codons = [adn_sequence[index:index + 3] for index in range(0, len(adn_sequence), 3)]
         nucleotide_alignment = ''
         codon_index = 0
@@ -130,7 +130,7 @@ if __name__ == '__main__':
         results_dir = create_results_dir(file)
         try:
             fasta_file = blast.run(f"{fastas_dir}/{file}", results_dir)
-        except (EmptyBlastResultError, BlastResultsError) as e:
+        except BlastResultsError as e:
             print(e.message)
             failed_count += 1
             continue

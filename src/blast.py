@@ -3,11 +3,6 @@ import os
 from Bio.Blast import NCBIXML
 
 
-class EmptyBlastResultError(RuntimeError):
-    def __init__(self, message):
-        self.message = message
-
-
 class BlastResultsError(RuntimeError):
     def __init__(self, message):
         self.message = message
@@ -18,28 +13,36 @@ class Blast:
         self._db_path = db_path
 
     def run(self, input_fasta, results_dir):
-        # Blast
-        try:
-            blast_result = os.popen(f'blastp -query {input_fasta} -db {self._db_path} -outfmt 5')
-            blast_records = NCBIXML.read(blast_result)
-        except ValueError:
-            raise EmptyBlastResultError(f"Couldn't find any blast result for file {input_fasta}")
+        blast_records = self.__blastp(input_fasta)
+
+        protein_sequence = self.__query_sequence(input_fasta)
+
+        filtered_results = self.__filter_results(blast_records, protein_sequence)
+
+        return self.__make_fasta(results_dir, filtered_results)
+
+    def __filter_results(self, blast_records, protein_sequence):
+        filtered_results = list(filter(
+            lambda alignment: self.__meets_expected_criteria(protein_sequence, alignment), blast_records.alignments
+        ))
+        if not filtered_results:
+            raise BlastResultsError("There is none blast result that meets filtering criteria")
+
+        return filtered_results
+
+    def __query_sequence(self, input_fasta):
         sequence = []
         with open(input_fasta, "r") as f:
             for line in f.readlines():
                 if not line.startswith(">"):
                     sequence.append(line)
-        protein_chain = "".join(sequence).replace("\n", "")
 
-        # Mejores hits segun criterio
-        filtered_results = list(filter(
-            lambda alignment: self.__meets_expected_criteria(protein_chain, alignment), blast_records.alignments
-        ))
+        return "".join(sequence).replace("\n", "")
 
-        if not filtered_results:
-            raise BlastResultsError("There is none blast result that meets filtering criteria")
-        # Crear Fasta con hits
-        return self.__make_fasta(results_dir, filtered_results)
+    def __blastp(self, input_fasta):
+        blast_result = os.popen(f'blastp -query {input_fasta} -db {self._db_path} -outfmt 5')
+        blast_records = NCBIXML.read(blast_result)
+        return blast_records
 
     def __evalue(self, alignment):
         hsp = alignment.hsps[0]
@@ -67,8 +70,11 @@ class Blast:
 
     def __make_fasta(self, results_dir, alignments):
         ids = ",".join(list(map(lambda alignment: alignment.hit_id.split('|')[1], alignments)))
-        blastdbcmd_result = os.popen(f'blastdbcmd -db {self._db_path} -entry {ids}').read()
+        blastdbcmd_result = self.__blastdbcmd(ids)
         fasta_file = open(f"{results_dir}/blast_result.fasta", "w")
         fasta_file.write(blastdbcmd_result)
         fasta_file.close()
         return fasta_file.name
+
+    def __blastdbcmd(self, ids):
+        return os.popen(f'blastdbcmd -db {self._db_path} -entry {ids}').read()
