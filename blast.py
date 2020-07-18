@@ -17,7 +17,7 @@ class Blast:
     def __init__(self, db_path):
         self._db_path = db_path
 
-    def run(self, input_fasta):
+    def run(self, input_fasta, results_dir):
         # Blast
         try:
             blast_result = os.popen(f'blastp -query {input_fasta} -db {self._db_path} -outfmt 5')
@@ -39,7 +39,7 @@ class Blast:
         if not filtered_results:
             raise BlastResultsError("There is none blast result that meets filtering criteria")
         # Crear Fasta con hits
-        return self.__make_fasta(input_fasta.split('/')[-1].split('.')[0], filtered_results)
+        return self.__make_fasta(results_dir, filtered_results)
 
     def __evalue(self, alignment):
         hsp = alignment.hsps[0]
@@ -65,10 +65,10 @@ class Blast:
     # coverage > 90% ((dfblst['q.end']-dfblst['q.start'])/query_length)*100.0
     # evalue < 0.005
 
-    def __make_fasta(self, filename, alignments):
+    def __make_fasta(self, results_dir, alignments):
         ids = ",".join(list(map(lambda alignment: alignment.hit_id.split('|')[1], alignments)))
         blastdbcmd_result = os.popen(f'blastdbcmd -db {self._db_path} -entry {ids}').read()
-        fasta_file = open(f"results/{filename}_blast_result.fasta", "w")
+        fasta_file = open(f"{results_dir}/blast_result.fasta", "w")
         fasta_file.write(blastdbcmd_result)
         fasta_file.close()
         return fasta_file.name

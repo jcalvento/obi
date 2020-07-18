@@ -1,5 +1,6 @@
 import datetime
 import os
+import shutil
 import subprocess
 
 import requests
@@ -34,21 +35,21 @@ def map_uniprot_ids_to_entrez_ids(fasta_file):
     ))
 
 
-def cd_hit(input_fasta):
-    cd_hit_output_file = 'results/clust100_' + input_fasta.split('/')[-1].split('.')[0]
+def cd_hit(input_fasta, results_dir):
+    cd_hit_output_file = f'{results_dir}/cd_hit'
     subprocess.call(['./../cdhit/cd-hit', '-i', input_fasta, '-o', cd_hit_output_file, '-c', '1'])
 
     return cd_hit_output_file
 
 
-def clustal(input_fasta):
-    clustal_output = f"results/clustalo_aligned{input_fasta.split('/')[-1].split('.')[0]}.fasta"
+def clustal(input_fasta, results_dir):
+    clustal_output = f"{results_dir}/clustalo_aligned.fasta"
     subprocess.call(['clustalo', '-i', input_fasta, '-o', clustal_output, "--force"])
 
     return clustal_output
 
 
-def protein_based_nucleotide_alignment(entrez_response, protein_alignment_path):
+def protein_based_nucleotide_alignment(entrez_response, protein_alignment_path, results_dir):
     alignments = {}
     current = None
     with open(protein_alignment_path, "r") as f:
@@ -77,18 +78,18 @@ def protein_based_nucleotide_alignment(entrez_response, protein_alignment_path):
                 codon_index += 1
         nucleotide_alignments[alignment_id] = nucleotide_alignment
 
-    nucleotide_fasta = open(f"results/nucleotide_{protein_alignment_path.split('/')[1]}", "w")
+    nucleotide_fasta = open(f"{results_dir}/nucleotide_alignment.fasta", "w")
     nucleotide_fasta.write('\n'.join(list(map(lambda key: f'>{key}\n{nucleotide_alignments[key]}', nucleotide_alignments))))
     nucleotide_fasta.close()
     return nucleotide_fasta.name
 
 
-def alignment_preparation(fasta_file):
-    cd_hit_output_file = cd_hit(fasta_file)
+def alignment_preparation(fasta_file, results_dir):
+    cd_hit_output_file = cd_hit(fasta_file, results_dir)
     uniprot_to_entrez = map_uniprot_ids_to_entrez_ids(cd_hit_output_file)
     entrez_response = EntrezDB().fetch_cds(uniprot_to_entrez)
-    clustal_output = clustal(cd_hit_output_file)
-    return protein_based_nucleotide_alignment(entrez_response, clustal_output)
+    clustal_output = clustal(cd_hit_output_file, results_dir)
+    return protein_based_nucleotide_alignment(entrez_response, clustal_output, results_dir)
 
 
 def generate_tree(nucleotide_alignment_path, boostrap):
@@ -107,6 +108,15 @@ def step_2(nucleotide_alignment_path, boostrap):
     hyphy(nucleotide_alignment_path, tree_path)
 
 
+def create_results_dir(file):
+    filename = file.split('/')[-1].split('.')[0]
+    dir_path = f'results/{filename}'
+    if os.path.isdir(dir_path):
+        shutil.rmtree(dir_path)
+    os.mkdir(dir_path)
+    return dir_path
+
+
 if __name__ == '__main__':
     files = os.listdir('./fasta')
     print(f"Whole process init time: {datetime.datetime.now()}")
@@ -115,16 +125,15 @@ if __name__ == '__main__':
 
     for file in [files[0]]:
         print(f"Init time: {datetime.datetime.now()}")
+        results_dir = create_results_dir(file)
         try:
-            fasta_file = blast.run(f"fasta/{file}")
+            fasta_file = blast.run(f"fasta/{file}", results_dir)
         except (EmptyBlastResultError, BlastResultsError) as e:
             print(e.message)
             failed_count += 1
             continue
-        # Checkpoint
         try:
-            nucleotide_alignment = alignment_preparation(fasta_file)
-            # nucleotide_alignment = 'results/nucleotide_clustalo_alignedclust100_P00784_blast_result.fasta'
+            nucleotide_alignment = alignment_preparation(fasta_file, results_dir)
             step_2(nucleotide_alignment, 1000)
         except InvalidEntrezIds:
             failed_count += 1
