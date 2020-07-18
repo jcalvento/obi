@@ -1,12 +1,13 @@
 import datetime
 import os
+import pathlib
 import shutil
 import subprocess
 
 import requests
 
-from blast import Blast, EmptyBlastResultError, BlastResultsError
-from entrez import EntrezDB, InvalidEntrezIds
+from src.blast import Blast, EmptyBlastResultError, BlastResultsError
+from src.entrez import EntrezDB, InvalidEntrezIds
 
 
 def map_uniprot_ids_to_entrez_ids(fasta_file):
@@ -110,7 +111,7 @@ def step_2(nucleotide_alignment_path, boostrap):
 
 def create_results_dir(file):
     filename = file.split('/')[-1].split('.')[0]
-    dir_path = f'results/{filename}'
+    dir_path = f'{pathlib.Path(__file__).parent.parent.absolute()}/results/{filename}'
     if os.path.isdir(dir_path):
         shutil.rmtree(dir_path)
     os.mkdir(dir_path)
@@ -118,16 +119,17 @@ def create_results_dir(file):
 
 
 if __name__ == '__main__':
-    files = os.listdir('./fasta')
+    fastas_dir = f"{pathlib.Path(__file__).parent.parent.absolute()}/fasta"
+    files = os.listdir(fastas_dir)
     print(f"Whole process init time: {datetime.datetime.now()}")
     failed_count = 0
-    blast = Blast('../swissprot/swissprot')
+    blast = Blast(f'{pathlib.Path(__file__).parent.parent.parent.absolute()}/swissprot/swissprot')
 
     for file in [files[0]]:
         print(f"Init time: {datetime.datetime.now()}")
         results_dir = create_results_dir(file)
         try:
-            fasta_file = blast.run(f"fasta/{file}", results_dir)
+            fasta_file = blast.run(f"{fastas_dir}/{file}", results_dir)
         except (EmptyBlastResultError, BlastResultsError) as e:
             print(e.message)
             failed_count += 1
