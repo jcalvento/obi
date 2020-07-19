@@ -38,7 +38,7 @@ def map_uniprot_ids_to_entrez_ids(fasta_file):
 
 def cd_hit(input_fasta, results_dir):
     cd_hit_output_file = f'{results_dir}/cd_hit'
-    subprocess.call(['./../cdhit/cd-hit', '-i', input_fasta, '-o', cd_hit_output_file, '-c', '1'])
+    subprocess.call(['cd-hit', '-i', input_fasta, '-o', cd_hit_output_file, '-c', '1'])
 
     return cd_hit_output_file
 
