@@ -44,28 +44,28 @@ class EntrezDB:
     def __init__(self):
         self._entrez_api_client = EntrezApiClient('juliancalvento@gmail.com')
 
-    def fetch_cds(self, ids):
-        if not ids:
+    def fetch_cds(self, ids_mapping):
+        if not ids_mapping:
             raise InvalidEntrezIds("Empty ids lists")
-        entrez_ids = list(map(lambda entrez_dict: entrez_dict['entrez_id'], ids))
+        entrez_ids = list(map(lambda id_mapping: id_mapping.to_id, ids_mapping))
         try:
             entrez_response = self._entrez_api_client.efetch(entrez_ids)
         except urllib.error.HTTPError:
             print(f"There's been an error with Entrez, ids: {entrez_ids}")
             return
-        return self.__parse_response(entrez_response, ids)
+        return self.__parse_response(entrez_response, ids_mapping)
 
-    def __parse_response(self, entrez_response, ids):
+    def __parse_response(self, entrez_response, ids_mapping):
         return list(map(lambda element: EntrezElement(
-            uniprot_id=self.__uniprot_id(element['GBSeq_other-seqids'], ids),
+            uniprot_id=self.__uniprot_id(element['GBSeq_other-seqids'], ids_mapping),
             location=self.__cds_location(element['GBSeq_feature-table']),
             translation=self.__entrez_translation(element['GBSeq_feature-table']),
             sequence=element['GBSeq_sequence']
         ), entrez_response))
 
-    def __uniprot_id(self, sequence_ids, ids):
+    def __uniprot_id(self, sequence_ids, ids_mapping):
         entrez_id = next((x for x in sequence_ids if x.startswith('ref|')), None).replace('ref|', '').replace('|', '')
-        return next((ids_map['uniprot_id'] for ids_map in ids if entrez_id in ids_map['entrez_id']), None)
+        return next((id_mapping.from_id for id_mapping in ids_mapping if entrez_id in id_mapping.to_id), None)
 
     def __cds_location(self, features):
         return next((feature['GBFeature_location'] for feature in features if feature['GBFeature_key'] == 'CDS'), None)

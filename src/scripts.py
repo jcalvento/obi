@@ -4,36 +4,10 @@ import pathlib
 import shutil
 import subprocess
 
-import requests
-
 from src.blast import Blast, BlastResultsError
 from src.entrez import EntrezDB, InvalidEntrezIds
 from src.nucleotide_aligner import NucleotideAligner
-
-
-def map_uniprot_ids_to_entrez_ids(fasta_file):
-    uniprot_ids = []
-    with open(fasta_file, "r") as f:
-        for line in f.readlines():
-            if line.startswith(">"):
-                uniprot_ids.append(line.split(" ")[0].replace(">", ""))
-
-    uniprot_response = requests.post(
-        url='https://www.uniprot.org/uploadlists/',
-        data={
-            'from': 'ACC+ID',
-            'to': 'REFSEQ_NT_ID',
-            'format': 'tab',
-            'query': " ".join(uniprot_ids)
-        }
-    )
-
-    assert uniprot_response.status_code == requests.status_codes.codes.ok
-
-    return list(map(
-        lambda result_line: {"uniprot_id": result_line.split("\t")[0], "entrez_id": result_line.split("\t")[1]},
-        uniprot_response.text.split("\n")[1:-1]
-    ))
+from src.uniprot_api import UniprotAPIClient
 
 
 def cd_hit(input_fasta, results_dir):
@@ -52,7 +26,7 @@ def clustal(input_fasta, results_dir):
 
 def alignment_preparation(fasta_file, results_dir):
     cd_hit_output_file = cd_hit(fasta_file, results_dir)
-    uniprot_to_entrez = map_uniprot_ids_to_entrez_ids(cd_hit_output_file)
+    uniprot_to_entrez = UniprotAPIClient().refseq_ids(cd_hit_output_file)
     entrez_response = EntrezDB().fetch_cds(uniprot_to_entrez)
     clustal_output = clustal(cd_hit_output_file, results_dir)
     return NucleotideAligner().protein_based_nucleotide_alignment(entrez_response, clustal_output, results_dir)
