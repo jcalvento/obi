@@ -3,6 +3,8 @@ from datetime import datetime
 
 from Bio import Entrez
 
+from src.utils import detect
+
 
 class InvalidEntrezIds(RuntimeError):
     def __init__(self, message):
@@ -64,14 +66,31 @@ class EntrezDB:
         ), entrez_response))
 
     def __uniprot_id(self, sequence_ids, ids_mapping):
-        entrez_id = next((x for x in sequence_ids if x.startswith('ref|')), None).replace('ref|', '').replace('|', '')
-        return next((id_mapping.from_id for id_mapping in ids_mapping if entrez_id in id_mapping.to_id), None)
+        entrez_id = detect(
+            lambda seq_id: seq_id.startswith('ref|'),
+            sequence_ids,
+            if_not_none=lambda seq_id: seq_id.replace('ref|', '').replace('|', '')
+        )
+        return detect(
+            lambda id_mapping: entrez_id in id_mapping.to_id,
+            ids_mapping, if_not_none=lambda id_mapping: id_mapping.from_id
+        )
 
     def __cds_location(self, features):
-        return next((feature['GBFeature_location'] for feature in features if feature['GBFeature_key'] == 'CDS'), None)
+        return detect(
+            self.is_cds_key,
+            features, if_not_none=lambda feature: feature['GBFeature_location']
+        )
+
+    def is_cds_key(self, feature):
+        return feature['GBFeature_key'] == 'CDS'
 
     def __entrez_translation(self, features):
-        feature_qualifiers = next(
-            (feature['GBFeature_quals'] for feature in features if feature['GBFeature_key'] == 'CDS'), None)
-        return next((qualifier['GBQualifier_value'] for qualifier in feature_qualifiers if
-                     qualifier['GBQualifier_name'] == 'translation'), None)
+        feature_qualifiers = detect(
+            self.is_cds_key,
+            features, if_not_none=lambda feature: feature['GBFeature_quals']
+        )
+        return detect(
+            lambda qualifier: qualifier['GBQualifier_name'] == 'translation',
+            feature_qualifiers, if_not_none=lambda qualifier: qualifier['GBQualifier_value']
+        )

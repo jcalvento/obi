@@ -24,14 +24,6 @@ def clustal(input_fasta, results_dir):
     return clustal_output
 
 
-def alignment_preparation(fasta_file, results_dir):
-    cd_hit_output_file = cd_hit(fasta_file, results_dir)
-    uniprot_to_entrez = UniprotAPIClient().refseq_ids(cd_hit_output_file)
-    entrez_response = EntrezDB().fetch_cds(uniprot_to_entrez)
-    clustal_output = clustal(cd_hit_output_file, results_dir)
-    return NucleotideAligner().protein_based_nucleotide_alignment(entrez_response, clustal_output, results_dir)
-
-
 def generate_tree(nucleotide_alignment_path, boostrap):
     os.popen(f'iqtree -s {nucleotide_alignment_path} -bb {boostrap}').read()
 
@@ -41,6 +33,14 @@ def generate_tree(nucleotide_alignment_path, boostrap):
 def hyphy(nucleotide_alignment_path, tree_path):
     subprocess.call(['hyphy', 'meme', '--alignment', nucleotide_alignment_path, '-bb', tree_path])
     # os.popen(f'hyphy meme --alignment {nucleotide_alignment_path} --tree {tree_path}').read()
+
+
+def alignment_preparation(fasta_file, results_dir):
+    cd_hit_output_file = cd_hit(fasta_file, results_dir)
+    uniprot_to_entrez = UniprotAPIClient().refseq_ids(cd_hit_output_file)
+    entrez_response = EntrezDB().fetch_cds(uniprot_to_entrez)
+    clustal_output = clustal(cd_hit_output_file, results_dir)
+    return NucleotideAligner().protein_based_nucleotide_alignment(entrez_response, clustal_output, results_dir)
 
 
 def step_2(nucleotide_alignment_path, boostrap):

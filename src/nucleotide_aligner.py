@@ -1,3 +1,6 @@
+from src.utils import detect
+
+
 class NucleotideAligner:
     def protein_based_nucleotide_alignment(self, entrez_response, protein_alignment_path, results_dir):
         alignments = self.__map_alignments_data(protein_alignment_path)
@@ -9,7 +12,7 @@ class NucleotideAligner:
     def __nucleotide_alignments(self, alignments, entrez_response):
         nucleotide_alignments = {}
         for entrez_row in entrez_response:
-            alignment_id = next((x for x in alignments if x.startswith(entrez_row.uniprot_id)), None)
+            alignment_id = detect(lambda seq_id: seq_id.startswith(entrez_row.uniprot_id), alignments)
             alignment = alignments[alignment_id]
             adn_codons = self.__adn_codons(entrez_row)
             nucleotide_alignment = ''
