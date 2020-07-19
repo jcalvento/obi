@@ -12,7 +12,6 @@ from src.nucleotide_aligner import NucleotideAligner
 
 
 def map_uniprot_ids_to_entrez_ids(fasta_file):
-    # Mappeo de Uniprot a Entrez
     uniprot_ids = []
     with open(fasta_file, "r") as f:
         for line in f.readlines():
@@ -89,7 +88,7 @@ if __name__ == '__main__':
     files = os.listdir(fastas_dir)
     print(f"Whole process init time: {datetime.datetime.now()}")
     failed_count = 0
-    blast = Blast(f'{pathlib.Path(__file__).parent.parent.parent.absolute()}/swissprot/swissprot')
+    blast = Blast(f'{pathlib.Path(__file__).parent.parent.absolute()}/swissprot/swissprot')
 
     for file in [files[0]]:
         print(f"Init time: {datetime.datetime.now()}")
