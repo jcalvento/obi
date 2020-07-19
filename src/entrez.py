@@ -43,8 +43,8 @@ class EntrezElement:
 
 
 class EntrezDB:
-    def __init__(self):
-        self._entrez_api_client = EntrezApiClient('juliancalvento@gmail.com')
+    def __init__(self, email):
+        self._entrez_api_client = EntrezApiClient(email)
 
     def fetch_cds(self, ids_mapping):
         if not ids_mapping:

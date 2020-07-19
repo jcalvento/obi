@@ -35,10 +35,10 @@ def hyphy(nucleotide_alignment_path, tree_path):
     # os.popen(f'hyphy meme --alignment {nucleotide_alignment_path} --tree {tree_path}').read()
 
 
-def alignment_preparation(fasta_file, results_dir):
+def alignment_preparation(fasta_file, results_dir, email):
     cd_hit_output_file = cd_hit(fasta_file, results_dir)
     uniprot_to_entrez = UniprotAPIClient().refseq_ids(cd_hit_output_file)
-    entrez_response = EntrezDB().fetch_cds(uniprot_to_entrez)
+    entrez_response = EntrezDB(email).fetch_cds(uniprot_to_entrez)
     clustal_output = clustal(cd_hit_output_file, results_dir)
     return NucleotideAligner().protein_based_nucleotide_alignment(entrez_response, clustal_output, results_dir)
 
@@ -50,7 +50,7 @@ def step_2(nucleotide_alignment_path, boostrap):
 
 def create_results_dir(file):
     filename = file.split('/')[-1].split('.')[0]
-    dir_path = f'{pathlib.Path(__file__).parent.parent.absolute()}/results/{filename}'
+    dir_path = f'{root_path}/results/{filename}'
     if os.path.isdir(dir_path):
         shutil.rmtree(dir_path)
     os.mkdir(dir_path)
@@ -58,11 +58,13 @@ def create_results_dir(file):
 
 
 if __name__ == '__main__':
-    fastas_dir = f"{pathlib.Path(__file__).parent.parent.absolute()}/fasta"
-    files = os.listdir(fastas_dir)
     print(f"Whole process init time: {datetime.datetime.now()}")
+    email = 'juliancalvento@gmail.com'
+    root_path = pathlib.Path(__file__).parent.parent.absolute()
+    fastas_dir = f"{root_path}/fasta"
+    files = os.listdir(fastas_dir)
     failed_count = 0
-    blast = Blast(f'{pathlib.Path(__file__).parent.parent.absolute()}/swissprot/swissprot')
+    blast = Blast(f'{root_path}/swissprot/swissprot')
 
     for file in [files[0]]:
         print(f"Init time: {datetime.datetime.now()}")
@@ -74,7 +76,7 @@ if __name__ == '__main__':
             failed_count += 1
             continue
         try:
-            nucleotide_alignment = alignment_preparation(fasta_file, results_dir)
+            nucleotide_alignment = alignment_preparation(fasta_file, results_dir, email)
             step_2(nucleotide_alignment, 1000)
         except InvalidEntrezIds:
             failed_count += 1
