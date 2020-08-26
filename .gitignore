@@ -133,3 +133,4 @@ dmypy.json
 results/
 fasta/
 swissprot
+pdb_chain_uniprot.csv
