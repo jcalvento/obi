@@ -4,8 +4,9 @@ import pathlib
 import shutil
 import subprocess
 
-from src.blast import Blast, BlastResultsError
+from src.blast import BlastResultsError, Blast
 from src.entrez import EntrezDB, InvalidEntrezIds
+from src.hyphy import Hyphy
 from src.nucleotide_aligner import NucleotideAligner
 from src.uniprot_api import UniprotAPIClient
 
@@ -24,28 +25,12 @@ def clustal(input_fasta, results_dir):
     return clustal_output
 
 
-def generate_tree(nucleotide_alignment_path, boostrap):
-    os.popen(f'iqtree -s {nucleotide_alignment_path} -bb {boostrap}').read()
-
-    return f'{nucleotide_alignment_path}.treefile'
-
-
-def hyphy(nucleotide_alignment_path, tree_path):
-    subprocess.call(['hyphy', 'meme', '--alignment', nucleotide_alignment_path, '-bb', tree_path])
-    # os.popen(f'hyphy meme --alignment {nucleotide_alignment_path} --tree {tree_path}').read()
-
-
 def alignment_preparation(fasta_file, results_dir, email):
     cd_hit_output_file = cd_hit(fasta_file, results_dir)
     uniprot_to_entrez = UniprotAPIClient().refseq_ids(cd_hit_output_file)
     entrez_response = EntrezDB(email).fetch_cds(uniprot_to_entrez)
     clustal_output = clustal(cd_hit_output_file, results_dir)
     return NucleotideAligner().protein_based_nucleotide_alignment(entrez_response, clustal_output, results_dir)
-
-
-def step_2(nucleotide_alignment_path, boostrap):
-    tree_path = generate_tree(nucleotide_alignment_path, boostrap)
-    hyphy(nucleotide_alignment_path, tree_path)
 
 
 def create_results_dir(file):
@@ -77,7 +62,7 @@ if __name__ == '__main__':
             continue
         try:
             nucleotide_alignment = alignment_preparation(fasta_file, results_dir, email)
-            step_2(nucleotide_alignment, 1000)
+            Hyphy(nucleotide_alignment).run(1000)
         except InvalidEntrezIds:
             failed_count += 1
         print(f"Finish time: {datetime.datetime.now()}")
