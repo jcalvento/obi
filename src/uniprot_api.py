@@ -13,7 +13,8 @@ class UniprotIdMapping:
 
 
 class UniprotAPIClient:
-    UNIPROT_UPLOADLISTS_URL = 'https://www.uniprot.org/uploadlists/'
+    # UNIPROT_UPLOADLISTS_URL = 'https://www.uniprot.org/uploadlists/' segun doc pero no anda...
+    UNIPROT_UPLOADLISTS_URL = 'https://ebi12.uniprot.org/mapping/'
 
     def refseq_ids(self, uniprot_ids):
         uniprot_response = requests.post(

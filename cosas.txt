@@ -94,3 +94,10 @@ cdna_region = perform_request(f"map/cdna/{id_}/{region}")
 translation = perform_request(f"map/translation/{id_}/{region}") # Tira 500
 
 translation
+
+Uniprot ftp
+https://ftp.uniprot.org/pub/databases/uniprot/current%5Frelease/knowledgebase/idmapping/
+
+PDBS
+https://ftp.ebi.ac.uk/pub/databases/msd/sifts/split_xml
+Cortar el pdb id desde 1:3 (segundo y tercer char), esa es la primer carpeta y después el nombre completo es todo el pdb

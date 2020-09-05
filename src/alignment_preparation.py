@@ -55,3 +55,7 @@ class AlignmentPreparation:
                 if row.get('SP_PRIMARY') in ids:
                     pdbs.append({'uniprot': row['SP_PRIMARY'], 'pdb': row['PDB']})
         self.__pdbs = pdbs
+
+    @property
+    def pdb_mapping(self):
+        return self.__pdbs

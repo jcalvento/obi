@@ -37,11 +37,11 @@ if __name__ == '__main__':
             failed_count += 1
             continue
         try:
-            nucleotide_alignment = AlignmentPreparation(
-                fasta_file, results_dir, email, f"{root_path}/pdb_chain_uniprot.csv"
-            ).run()
+            alignment_preparation = AlignmentPreparation(fasta_file, results_dir, email, f"{root_path}/pdb_chain_uniprot.csv")
+            nucleotide_alignment = alignment_preparation.run()
             hyphy_result = Hyphy(nucleotide_alignment).run(1000)
             hyphy_result
+            print(alignment_preparation.pdb_mapping)
         except InvalidEntrezIds:
             failed_count += 1
         print(f"Finish time: {datetime.datetime.now()}")
