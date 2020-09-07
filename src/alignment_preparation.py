@@ -1,5 +1,6 @@
 import csv
 import subprocess
+from shutil import copyfile
 
 from src.entrez import EntrezDB
 from src.nucleotide_aligner import NucleotideAligner
@@ -27,7 +28,12 @@ class AlignmentPreparation:
         cd_hit_output_file = self.__cd_hit()
         uniprot_to_entrez = UniprotAPIClient().refseq_ids(self.__uniprot_ids)
         entrez_response = EntrezDB(self.__email).fetch_cds(uniprot_to_entrez)
-        clustal_output = self.__clustal(cd_hit_output_file)
+        if len(self.__uniprot_ids) <= 1:
+            print(f"Not enough records to align {self.__uniprot_ids}")
+            clustal_output = f"{self.__results_dir}/clustalo_aligned.fasta"
+            copyfile(self.__fasta_file, clustal_output)
+        else:
+            clustal_output = self.__clustal(cd_hit_output_file)
 
         return NucleotideAligner().protein_based_nucleotide_alignment(
             entrez_response, clustal_output, self.__results_dir

@@ -55,17 +55,25 @@ class EntrezDB:
         except urllib.error.HTTPError:
             print(f"There's been an error with Entrez, ids: {entrez_ids}")
             return
-        return self.__parse_response(entrez_response, ids_mapping)
+        return self._parse_response(entrez_response, ids_mapping)
 
-    def __parse_response(self, entrez_response, ids_mapping):
-        return list(map(lambda element: EntrezElement(
-            uniprot_id=self.__uniprot_id(element['GBSeq_other-seqids'], ids_mapping),
-            location=self.__cds_location(element['GBSeq_feature-table']),
-            translation=self.__entrez_translation(element['GBSeq_feature-table']),
-            sequence=element['GBSeq_sequence']
-        ), entrez_response))
+    def _parse_response(self, entrez_response, ids_mapping):
+        parsed_response = []
+        for element in entrez_response:
+            try:
+                parsed_response.append(
+                    EntrezElement(
+                        uniprot_id=self._uniprot_id(element['GBSeq_other-seqids'], ids_mapping),
+                        location=self._cds_location(element['GBSeq_feature-table']),
+                        translation=self._entrez_translation(element['GBSeq_feature-table']),
+                        sequence=element['GBSeq_sequence'])
+                )
+            except InvalidEntrezIds as e:
+                print(f"{self._uniprot_id(element['GBSeq_other-seqids'], ids_mapping)} {e}")
 
-    def __uniprot_id(self, sequence_ids, ids_mapping):
+        return parsed_response
+
+    def _uniprot_id(self, sequence_ids, ids_mapping):
         entrez_id = detect(
             lambda seq_id: seq_id.startswith('ref|'),
             sequence_ids,
@@ -76,21 +84,25 @@ class EntrezDB:
             ids_mapping, if_not_none=lambda id_mapping: id_mapping.from_id
         )
 
-    def __cds_location(self, features):
+    def _cds_location(self, features):
         return detect(
-            self.is_cds_key,
-            features, if_not_none=lambda feature: feature['GBFeature_location']
+            self._is_cds_key,
+            features, if_not_none=lambda feature: feature['GBFeature_location'],
+            if_none=lambda: self.__throw(InvalidEntrezIds("CDS not found"))
         )
 
-    def is_cds_key(self, feature):
+    def _is_cds_key(self, feature):
         return feature['GBFeature_key'] == 'CDS'
 
-    def __entrez_translation(self, features):
+    def _entrez_translation(self, features):
         feature_qualifiers = detect(
-            self.is_cds_key,
+            self._is_cds_key,
             features, if_not_none=lambda feature: feature['GBFeature_quals']
         )
         return detect(
             lambda qualifier: qualifier['GBQualifier_name'] == 'translation',
             feature_qualifiers, if_not_none=lambda qualifier: qualifier['GBQualifier_value']
         )
+
+    def __throw(self, exception):
+        raise exception

@@ -6,6 +6,7 @@ from src.alignment_preparation import AlignmentPreparation
 from src.blast import BlastResultsError, Blast
 from src.entrez import InvalidEntrezIds
 from src.hyphy import Hyphy
+from src.sifts import Sifts
 
 
 def create_results_dir(file):
@@ -13,7 +14,8 @@ def create_results_dir(file):
     dir_path = f'{root_path}/results/{filename}'
     # if os.path.isdir(dir_path):
     #     shutil.rmtree(dir_path)
-    # os.mkdir(dir_path)
+    if not os.path.isdir(dir_path):
+        os.mkdir(dir_path)
     return dir_path
 
 
@@ -26,7 +28,7 @@ if __name__ == '__main__':
     failed_count = 0
     blast = Blast(f'{root_path}/swissprot/swissprot')
 
-    for file in [files[0]]:
+    for file in files:
         print(f"Init time: {datetime.datetime.now()}")
         results_dir = create_results_dir(file)
         try:
@@ -39,9 +41,11 @@ if __name__ == '__main__':
         try:
             alignment_preparation = AlignmentPreparation(fasta_file, results_dir, email, f"{root_path}/pdb_chain_uniprot.csv")
             nucleotide_alignment = alignment_preparation.run()
-            hyphy_result = Hyphy(nucleotide_alignment).run(1000)
-            hyphy_result
+            # hyphy_result = Hyphy(nucleotide_alignment).run(1000)
             print(alignment_preparation.pdb_mapping)
+            sifts = Sifts()
+            for mapping in alignment_preparation.pdb_mapping:
+                sifts.map_to(mapping['pdb'])
         except InvalidEntrezIds:
             failed_count += 1
         print(f"Finish time: {datetime.datetime.now()}")

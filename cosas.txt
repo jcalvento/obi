@@ -101,3 +101,7 @@ https://ftp.uniprot.org/pub/databases/uniprot/current%5Frelease/knowledgebase/id
 PDBS
 https://ftp.ebi.ac.uk/pub/databases/msd/sifts/split_xml
 Cortar el pdb id desde 1:3 (segundo y tercer char), esa es la primer carpeta y después el nombre completo es todo el pdb
+
+Preguntas:
+Qué pasa con las respuesta de entrez que no tienen cds?
+Qué pasa cuando no hay qué alinear?
