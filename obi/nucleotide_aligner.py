@@ -1,4 +1,4 @@
-from src.utils import detect
+from obi.utils import detect
 
 
 class NucleotideAligner:

@@ -2,9 +2,9 @@ import csv
 import subprocess
 from shutil import copyfile
 
-from src.entrez import EntrezDB
-from src.nucleotide_aligner import NucleotideAligner
-from src.uniprot_api import UniprotAPIClient
+from obi.entrez import EntrezDB
+from obi.nucleotide_aligner import NucleotideAligner
+from obi.uniprot_api import UniprotAPIClient
 
 
 def parse_uniprot_ids(fasta_file):

@@ -1,12 +1,12 @@
 import datetime
 import os
 
-from src import utils
-from src.alignment_preparation import AlignmentPreparation
-from src.blast import BlastResultsError, Blast
-from src.entrez import InvalidEntrezIds
-from src.hyphy import Hyphy
-from src.sifts import Sifts
+from obi import utils
+from obi.alignment_preparation import AlignmentPreparation
+from obi.blast import BlastResultsError, Blast
+from obi.entrez import InvalidEntrezIds
+from obi.hyphy import Hyphy
+from obi.sifts import Sifts
 
 
 def create_results_dir(file):

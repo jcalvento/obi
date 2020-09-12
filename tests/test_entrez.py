@@ -1,7 +1,7 @@
 from pytest import fixture
 
-from src.entrez import EntrezDB
-from src.uniprot_api import UniprotIdMapping
+from obi.entrez import EntrezDB
+from obi.uniprot_api import UniprotIdMapping
 
 
 class TestEntrezDB:
