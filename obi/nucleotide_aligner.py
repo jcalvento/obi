@@ -2,12 +2,16 @@ from obi.utils import detect
 
 
 class NucleotideAligner:
+    def __init__(self):
+        self.alignments = []
+        self.nucleotide_alignments = []
+
     def protein_based_nucleotide_alignment(self, entrez_response, protein_alignment_path, results_dir):
-        alignments = self.__map_alignments_data(protein_alignment_path)
+        self.alignments = self.__map_alignments_data(protein_alignment_path)
 
-        nucleotide_alignments = self.__nucleotide_alignments(alignments, entrez_response)
+        self.nucleotide_alignments = self.__nucleotide_alignments(self.alignments, entrez_response)
 
-        return self.__write_results(nucleotide_alignments, results_dir)
+        return self.__write_results(self.nucleotide_alignments, results_dir)
 
     def __nucleotide_alignments(self, alignments, entrez_response):
         nucleotide_alignments = {}

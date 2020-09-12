@@ -21,7 +21,7 @@ def _create_results_dir(pdb_root_id):
 class Sifts:
     def map_to(self, pdb_id):
         pdb_xml = self.__download_xml(pdb_id)
-        self.__parse_sifts(pdb_xml)
+        return self.__parse_sifts(pdb_xml)
 
     def __download_xml(self, pdb_id):
         pdb_root_id = pdb_id[1:3]

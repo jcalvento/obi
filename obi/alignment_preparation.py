@@ -22,12 +22,15 @@ class AlignmentPreparation:
         self.__email = email
         self.__results_dir = results_dir
         self.__fasta_file = fasta_file
+        self.alignments = []
+        self.nucleotide_alignments = []
+        self.uniprot_entrez_mapping = []
 
     def run(self):
         self.__map_uniprot_to_pdb()
         cd_hit_output_file = self.__cd_hit()
-        uniprot_to_entrez = UniprotAPIClient().refseq_ids(self.__uniprot_ids)
-        entrez_response = EntrezDB(self.__email).fetch_cds(uniprot_to_entrez)
+        self.uniprot_entrez_mapping = UniprotAPIClient().refseq_ids(self.__uniprot_ids)
+        entrez_response = EntrezDB(self.__email).fetch_cds(self.uniprot_entrez_mapping)
         if len(self.__uniprot_ids) <= 1:
             print(f"Not enough records to align {self.__uniprot_ids}")
             clustal_output = f"{self.__results_dir}/clustalo_aligned.fasta"
@@ -35,9 +38,14 @@ class AlignmentPreparation:
         else:
             clustal_output = self.__clustal(cd_hit_output_file)
 
-        return NucleotideAligner().protein_based_nucleotide_alignment(
+        nucleotide_aligner = NucleotideAligner()
+        nucleotide_alignment_path = nucleotide_aligner.protein_based_nucleotide_alignment(
             entrez_response, clustal_output, self.__results_dir
         )
+        self.alignments = nucleotide_aligner.alignments
+        self.nucleotide_alignments = nucleotide_aligner.nucleotide_alignments
+
+        return nucleotide_alignment_path
 
     def __cd_hit(self):
         cd_hit_output_file = f'{self.__results_dir}/cd_hit'

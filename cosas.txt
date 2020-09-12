@@ -103,7 +103,7 @@ https://ftp.ebi.ac.uk/pub/databases/msd/sifts/split_xml
 Cortar el pdb id desde 1:3 (segundo y tercer char), esa es la primer carpeta y después el nombre completo es todo el pdb
 
 Preguntas:
-Qué pasa con las respuesta de entrez que no tienen cds?
-Qué pasa cuando no hay qué alinear?
+Qué pasa con las respuesta de entrez que no tienen cds? Debe ser porque no es uno de la base, ignorar
+Qué pasa cuando no hay qué alinear? Cortar ahí
 
 https://docs.google.com/spreadsheets/d/1-lkyhkNnA2yCsoNDN3v-1oVCsgH3I-qRtN1D4ue3Q_s/edit#gid=0
