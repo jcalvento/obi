@@ -16,36 +16,57 @@ def parse_uniprot_ids(fasta_file):
     return uniprot_ids
 
 
+class AlignmentPreparationResult:
+    def __init__(self, nucleotide_alignment_result, uniprot_pdb_mapping, uniprot_entrez_mapping):
+        self.uniprot_entrez_mapping = uniprot_entrez_mapping
+        self.uniprot_pdb_mapping = uniprot_pdb_mapping
+        self.__nucleotide_alignment_result = nucleotide_alignment_result
+
+    @property
+    def nucleotide_alignment(self):
+        return self.__nucleotide_alignment_result.nucleotide_alignment
+
+    @property
+    def amino_acid_alignment(self):
+        return self.__nucleotide_alignment_result.amino_acid_alignment
+
+    @property
+    def codons(self):
+        return self.__nucleotide_alignment_result.codons
+
+    @property
+    def nucleotide_alignment_path(self):
+        return self.__nucleotide_alignment_result.nucleotide_alignment_path
+
+
 class AlignmentPreparation:
     def __init__(self, fasta_file, results_dir, email, pdb_csv_file):
         self.__pdb_csv_file = pdb_csv_file
         self.__email = email
         self.__results_dir = results_dir
         self.__fasta_file = fasta_file
-        self.alignments = []
-        self.nucleotide_alignments = []
-        self.uniprot_entrez_mapping = []
 
     def run(self):
-        self.__map_uniprot_to_pdb()
+        uniprot_pds_mapping = self.__map_uniprot_to_pdb()
         cd_hit_output_file = self.__cd_hit()
-        self.uniprot_entrez_mapping = UniprotAPIClient().refseq_ids(self.__uniprot_ids)
-        entrez_response = EntrezDB(self.__email).fetch_cds(self.uniprot_entrez_mapping)
+        uniprot_entrez_mapping = UniprotAPIClient().refseq_ids(self.__uniprot_ids)
+        entrez_response = EntrezDB(self.__email).fetch_cds(uniprot_entrez_mapping)
+        clustal_output = self.__amino_acids_alignment(cd_hit_output_file)
+
+        nucleotide_alignment_result = NucleotideAligner().protein_based_nucleotide_alignment(
+            entrez_response, clustal_output, self.__results_dir
+        )
+
+        return AlignmentPreparationResult(nucleotide_alignment_result, uniprot_pds_mapping, uniprot_entrez_mapping)
+
+    def __amino_acids_alignment(self, cd_hit_output_file):
         if len(self.__uniprot_ids) <= 1:
             print(f"Not enough records to align {self.__uniprot_ids}")
             clustal_output = f"{self.__results_dir}/clustalo_aligned.fasta"
             copyfile(self.__fasta_file, clustal_output)
         else:
             clustal_output = self.__clustal(cd_hit_output_file)
-
-        nucleotide_aligner = NucleotideAligner()
-        nucleotide_alignment_path = nucleotide_aligner.protein_based_nucleotide_alignment(
-            entrez_response, clustal_output, self.__results_dir
-        )
-        self.alignments = nucleotide_aligner.alignments
-        self.nucleotide_alignments = nucleotide_aligner.nucleotide_alignments
-
-        return nucleotide_alignment_path
+        return clustal_output
 
     def __cd_hit(self):
         cd_hit_output_file = f'{self.__results_dir}/cd_hit'
@@ -68,8 +89,4 @@ class AlignmentPreparation:
             for row in reader:
                 if row.get('SP_PRIMARY') in ids:
                     pdbs.append({'uniprot': row['SP_PRIMARY'], 'pdb': row['PDB']})
-        self.__pdbs = pdbs
-
-    @property
-    def pdb_mapping(self):
-        return self.__pdbs
+        return pdbs

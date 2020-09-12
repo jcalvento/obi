@@ -6,8 +6,8 @@ from obi.alignment_preparation import AlignmentPreparation
 from obi.blast import BlastResultsError, Blast
 from obi.entrez import InvalidEntrezIds
 from obi.hyphy import Hyphy
+from obi.positive_selection_report import PositiveSelectionReport
 from obi.sifts import Sifts
-from obi.utils import detect
 
 
 def create_results_dir(file):
@@ -34,43 +34,23 @@ if __name__ == '__main__':
         results_dir = create_results_dir(file)
         try:
             fasta_file = blast.run(f"{fastas_dir}/{file}", results_dir)
-            # None
         except BlastResultsError as e:
             print(e.message)
             failed_count += 1
             continue
         try:
-            alignment_preparation = AlignmentPreparation(fasta_file, results_dir, email, f"{root_path}/pdb_chain_uniprot.csv")
-            nucleotide_alignment = alignment_preparation.run()
-            hyphy_result = Hyphy(nucleotide_alignment).run(1000)
-            print(alignment_preparation.pdb_mapping)
+            alignment_preparation_result = AlignmentPreparation(
+                fasta_file, results_dir, email, f"{root_path}/pdb_chain_uniprot.csv"
+            ).run()
+            hyphy_result = Hyphy(alignment_preparation_result.nucleotide_alignment_path).run(1000)
+            print(alignment_preparation_result.uniprot_pdb_mapping)
             sifts = Sifts()
-            pdb_mappings = list(map(lambda mapping: sifts.map_to(mapping['pdb']), alignment_preparation.pdb_mapping))
-            positive_selection_rows = []
-            for index, row in enumerate(hyphy_result):
-                if row['p-value'] <= 0.1:
-                    row['index'] = index
-                    positive_selection_rows.append(row)
-            result = []
-            for uniprot_id, alignment in alignment_preparation.nucleotide_alignments.items():
-                acc_number = detect(
-                    lambda mapping: uniprot_id.startswith(mapping.from_id),
-                    alignment_preparation.uniprot_entrez_mapping
-                ).to_id
-                rows = []
-                codons = [alignment[index:index + 3] for index in range(0, len(alignment), 3)]
-                for selection_row in positive_selection_rows:
-                    row = {
-                        "uniprot_id": uniprot_id,
-                        'acc_number': acc_number,
-                        'index': selection_row['index'],
-                        'p-value': selection_row['p-value'],
-                        'codon': codons[selection_row['index']],  # Creo que no se necesita del alineamiento si no de la cadena
-                        'aa': alignment_preparation.alignments[uniprot_id][selection_row['index']]
-                    }
-                    rows.append(row)
-                result.append({uniprot_id: rows})
-            print(result)
+            pdb_mappings = list(map(
+                lambda mapping: sifts.map_to(mapping['pdb']),
+                alignment_preparation_result.uniprot_pdb_mapping
+            ))
+            report = PositiveSelectionReport(alignment_preparation_result, hyphy_result, pdb_mappings).generate()
+            print(report)
 
         except InvalidEntrezIds:
             failed_count += 1
