@@ -2,8 +2,8 @@ from obi.utils import detect
 
 
 class NucleotideAlignerResult:
-    def __init__(self, amino_acid_alignment, nucleotide_alignment, nucleotide_alignment_path, codons):
-        self.codons = codons
+    def __init__(self, amino_acid_alignment, nucleotide_alignment, nucleotide_alignment_path, codons_and_translations):
+        self.codons_and_translations = codons_and_translations
         self.nucleotide_alignment_path = nucleotide_alignment_path
         self.nucleotide_alignment = nucleotide_alignment
         self.amino_acid_alignment = amino_acid_alignment
@@ -15,18 +15,24 @@ class NucleotideAligner:
         nucleotide_alignments = self.__nucleotide_alignments(alignments, entrez_response)
         nucleotide_alignments_path = self.__write_results(nucleotide_alignments, results_dir)
 
-        return NucleotideAlignerResult(alignments, nucleotide_alignments, nucleotide_alignments_path, self.__codons)
+        return NucleotideAlignerResult(
+            alignments, nucleotide_alignments, nucleotide_alignments_path, self.__codons_and_translation
+        )
 
     def __nucleotide_alignments(self, alignments, entrez_response):
         nucleotide_alignments = {}
-        self.__codons = []
+        self.__codons_and_translation = {}
         for entrez_row in entrez_response:
             alignment_id = detect(lambda seq_id: seq_id.startswith(entrez_row.uniprot_id), alignments)
-            alignment = alignments[alignment_id]
+            alignment = alignments.get(alignment_id)
+            if not alignment:
+                continue  # FIXME: Mandar a entrez solo los cabeza de grupo de cd hit
             adn_codons = self.__adn_codons(entrez_row)
             nucleotide_alignment = ''
             codon_index = 0
-            self.__codons.append({entrez_row.uniprot_id: adn_codons})
+            self.__codons_and_translation[alignment_id] = {
+                "codons": adn_codons, "translation": entrez_row.translation
+            }
             for amino_acid in alignment:
                 if amino_acid == '-':
                     nucleotide_alignment += '---'

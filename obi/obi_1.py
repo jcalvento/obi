@@ -19,10 +19,13 @@ class Obi:
         hyphy_result = Hyphy(alignment_preparation_result.nucleotide_alignment_path).run(1000)
         print(alignment_preparation_result.uniprot_pdb_mapping)
         sifts = Sifts()
-        pdb_mappings = list(map(
-            lambda mapping: sifts.map_to(mapping['pdb']),
-            alignment_preparation_result.uniprot_pdb_mapping
-        ))
+        pdb_mappings = {}
+        for uniprot_id, pdbs in alignment_preparation_result.uniprot_pdb_mapping.items():
+            pdbs_data = list(map(
+                lambda pdb_id: sifts.map_to(pdb_id),
+                pdbs
+            ))
+            pdb_mappings[uniprot_id] = pdbs_data
         report = PositiveSelectionReport(alignment_preparation_result, hyphy_result, pdb_mappings).generate()
         print(report)
         return report

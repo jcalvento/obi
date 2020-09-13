@@ -22,3 +22,10 @@ def create_results_dir(file, root=root_path()):
     if not os.path.isdir(dir_path):
         os.mkdir(dir_path)
     return dir_path
+
+
+def get_element(elements, index, default=None):
+    try:
+        return elements[index]
+    except IndexError:
+        return default

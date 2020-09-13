@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 from functools import reduce
 
 
@@ -19,7 +20,7 @@ class Hyphy:
         return f'{self._nucleotide_alignment_path}.treefile'
 
     def _hyphy(self, tree_path):
-        os.subprocess.call(['hyphy', 'meme', '--alignment', self._nucleotide_alignment_path, '-bb', tree_path])
+        subprocess.call(['hyphy', 'meme', '--alignment', self._nucleotide_alignment_path, '-bb', tree_path])
 
     def _parsed_response(self):
         with open(self._nucleotide_alignment_path + ".MEME.json", 'r') as hyphy_result:

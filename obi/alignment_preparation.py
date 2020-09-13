@@ -31,8 +31,8 @@ class AlignmentPreparationResult:
         return self.__nucleotide_alignment_result.amino_acid_alignment
 
     @property
-    def codons(self):
-        return self.__nucleotide_alignment_result.codons
+    def codons_and_translations(self):
+        return self.__nucleotide_alignment_result.codons_and_translations
 
     @property
     def nucleotide_alignment_path(self):
@@ -85,8 +85,11 @@ class AlignmentPreparation:
         ids = list(map(lambda uniprot_id: uniprot_id.split('.')[0], self.__uniprot_ids))
         with open(self.__pdb_csv_file, newline='') as csv_file:
             reader = csv.DictReader(filter(lambda csv_row: csv_row[0] != '#', csv_file))
-            pdbs = []
+            mapping = {}
             for row in reader:
                 if row.get('SP_PRIMARY') in ids:
-                    pdbs.append({'uniprot': row['SP_PRIMARY'], 'pdb': row['PDB']})
-        return pdbs
+                    if not mapping.get(row['SP_PRIMARY']):
+                        mapping[row['SP_PRIMARY']] = [row['PDB']]
+                    else:
+                        mapping[row['SP_PRIMARY']].append(row['PDB'])
+        return mapping

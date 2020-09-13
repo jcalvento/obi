@@ -56,8 +56,8 @@ class Sifts:
             for seg in ent.segments:
                 for res in seg.residues:
                     if res.pdbresnum:
-                        residues.setdefault(res.chainid, {}).setdefault(res.uniprotaccession, {})
-                        residues[res.chainid][res.uniprotaccession][res.pdbresnum] = res.uniprotpos
+                        residues.setdefault(res.pdbid, {}).setdefault(res.chainid, {})
+                        residues[res.pdbid][res.chainid][res.uniprotpos] = res.pdbresnum
                     if res.notobserved:
                         nob.setdefault(res.chainid, [])
                         nob[res.chainid].append(res.uniprotpos)
