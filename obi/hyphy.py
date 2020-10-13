@@ -9,8 +9,8 @@ class Hyphy:
         self._nucleotide_alignment_path = nucleotide_alignment_path
 
     def run(self, bootstrap=1000):
-        # tree_path = self._generate_tree(bootstrap)
-        # self._hyphy(tree_path)
+        tree_path = self._generate_tree(bootstrap)
+        self._hyphy(tree_path)
 
         return self._parsed_response()
 

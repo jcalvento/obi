@@ -61,6 +61,8 @@ class EntrezDB:
         parsed_response = []
         for element in entrez_response:
             try:
+                if not element.get('GBSeq_sequence'):
+                    raise InvalidEntrezIds("Sequence not found")
                 parsed_response.append(
                     EntrezElement(
                         uniprot_id=self._uniprot_id(element['GBSeq_other-seqids'], ids_mapping),

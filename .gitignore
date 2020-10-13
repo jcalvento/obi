@@ -135,3 +135,4 @@ fasta/
 swissprot
 pdb_chain_uniprot.csv
 sifts
+tests/tests_result_files

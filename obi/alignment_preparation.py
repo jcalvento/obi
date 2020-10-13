@@ -2,6 +2,8 @@ import csv
 import subprocess
 from shutil import copyfile
 
+from obi import cd_hit
+from obi.cd_hit import replace_cluster_heads
 from obi.entrez import EntrezDB
 from obi.nucleotide_aligner import NucleotideAligner
 from obi.uniprot_api import UniprotAPIClient
@@ -14,6 +16,20 @@ def parse_uniprot_ids(fasta_file):
             if line.startswith(">"):
                 uniprot_ids.append(line.split(" ")[0].replace(">", ""))
     return uniprot_ids
+
+
+def fasta_content(fasta_file):
+    content = {}
+    with open(fasta_file, "r") as f:
+        current_id = None
+        for line in f.readlines():
+            if line.startswith(">"):
+                current_id = line.split(" ")[0].replace(">", "")
+                content[current_id] = {"header": line}
+            else:
+                content[current_id].setdefault("sequence", "")
+                content[current_id]["sequence"] += line  # Con o sin enters? .replace('\n', '')
+    return content
 
 
 class AlignmentPreparationResult:
@@ -45,19 +61,28 @@ class AlignmentPreparation:
         self.__email = email
         self.__results_dir = results_dir
         self.__fasta_file = fasta_file
+        self.__fasta_content = fasta_content(self.__fasta_file)
 
     def run(self):
         uniprot_pds_mapping = self.__map_uniprot_to_pdb()
-        cd_hit_output_file = self.__cd_hit()
+        cd_hit_output = self.__cd_hit(uniprot_pds_mapping)
         uniprot_entrez_mapping = UniprotAPIClient().refseq_ids(self.__uniprot_ids)
         entrez_response = EntrezDB(self.__email).fetch_cds(uniprot_entrez_mapping)
-        clustal_output = self.__amino_acids_alignment(cd_hit_output_file)
+        clustal_output = self.__amino_acids_alignment(cd_hit_output)
 
         nucleotide_alignment_result = NucleotideAligner().protein_based_nucleotide_alignment(
             entrez_response, clustal_output, self.__results_dir
         )
 
         return AlignmentPreparationResult(nucleotide_alignment_result, uniprot_pds_mapping, uniprot_entrez_mapping)
+
+    def __cd_hit(self, uniprot_pds_mapping):
+        cd_hit_output_file = f'{self.__results_dir}/cd_hit'
+        cd_hit_output = cd_hit.process(self.__fasta_file, cd_hit_output_file)
+
+        return replace_cluster_heads(
+            cd_hit_output, self.__fasta_content, uniprot_pds_mapping, f"{cd_hit_output.output_file}_replaced"
+        )
 
     def __amino_acids_alignment(self, cd_hit_output_file):
         if len(self.__uniprot_ids) <= 1:
@@ -67,12 +92,6 @@ class AlignmentPreparation:
         else:
             clustal_output = self.__clustal(cd_hit_output_file)
         return clustal_output
-
-    def __cd_hit(self):
-        cd_hit_output_file = f'{self.__results_dir}/cd_hit'
-        subprocess.call(['cd-hit', '-i', self.__fasta_file, '-o', cd_hit_output_file, '-c', '1'])
-
-        return cd_hit_output_file
 
     def __clustal(self, cd_hit_results_file):
         clustal_output = f"{self.__results_dir}/clustalo_aligned.fasta"

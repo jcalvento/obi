@@ -4,11 +4,12 @@ import os
 from obi import utils
 from obi.blast import BlastResultsError, Blast
 from obi.entrez import InvalidEntrezIds
-from obi.obi_1 import Obi
+from obi.obi_1 import Obi, HyphyError
 from obi.utils import create_results_dir
 
 if __name__ == '__main__':
-    print(f"Whole process init time: {datetime.datetime.now()}")
+    init_time = datetime.datetime.now()
+    print(f"Whole process init time: {init_time}")
     email = 'juliancalvento@gmail.com'
     root_path = utils.root_path()
     fastas_dir = f"{root_path}/fasta"
@@ -16,7 +17,7 @@ if __name__ == '__main__':
     failed_count = 0
     blast = Blast(f'{root_path}/swissprot/swissprot')
 
-    for file in ['P02769.fasta']:
+    for file in files:  # P00766 fallo
         print(f"Init time: {datetime.datetime.now()}")
         results_dir = create_results_dir(file)
         obi_1 = Obi(
@@ -24,11 +25,10 @@ if __name__ == '__main__':
         )
         try:
             obi_1.run(f"{fastas_dir}/{file}")
-        except BlastResultsError as e:
+        except (BlastResultsError, HyphyError, InvalidEntrezIds) as e:
             print(e.message)
             failed_count += 1
             continue
-        except InvalidEntrezIds:
-            failed_count += 1
         print(f"Finish time: {datetime.datetime.now()}")
-    print(f"Whole process finish time: {datetime.datetime.now()}, failed: {failed_count}")
+    finish_time = datetime.datetime.now()
+    print(f"Whole process finish time: {finish_time}, took {finish_time - init_time}, failed: {failed_count}")
