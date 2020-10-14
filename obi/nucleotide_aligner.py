@@ -27,6 +27,11 @@ class NucleotideAligner:
             alignment = alignments.get(alignment_id)
             if not alignment:
                 continue  # FIXME: Mandar a entrez solo los cabeza de grupo de cd hit
+            if alignment.replace("-", "") != entrez_row.translation:
+                print(f"{alignment_id} differs on the sequence")  # TODO: log? Mejor forma de validacion?
+                print(f"Alignment: {alignment.replace('-', '')}")
+                print(f"Translation: {entrez_row.translation}")
+                continue
             adn_codons = self.__adn_codons(entrez_row)
             nucleotide_alignment = ''
             codon_index = 0

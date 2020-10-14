@@ -17,7 +17,7 @@ if __name__ == '__main__':
     failed_count = 0
     blast = Blast(f'{root_path}/swissprot/swissprot')
 
-    for file in files:  # P00766 fallo
+    for file in ['P00766.fasta']:
         print(f"Init time: {datetime.datetime.now()}")
         results_dir = create_results_dir(file)
         obi_1 = Obi(
