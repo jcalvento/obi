@@ -38,6 +38,7 @@ class TestEntrezDB:
         assert sequence == entrez_mapping.sequence
         assert translation == entrez_mapping.translation
         assert '48..1115' == entrez_mapping.location
+        assert 'NM_119701.4' == entrez_mapping.locus_version
 
     def test_given_two_uniprot_refseq_mapping_when_it_fetches_the_cds_returns_results_for_both(self, entrez_api):
         mapping = UniprotIdMapping('O65493\tNM_119701.4')
@@ -52,3 +53,4 @@ class TestEntrezDB:
         assert another_entrez_mapping.sequence != entrez_mapping.sequence
         assert another_entrez_mapping.translation != entrez_mapping.translation
         assert another_entrez_mapping.location != entrez_mapping.location
+        assert another_entrez_mapping.locus_version != entrez_mapping.locus_version

@@ -28,7 +28,7 @@ class NucleotideAligner:
             if not alignment:
                 continue  # FIXME: Mandar a entrez solo los cabeza de grupo de cd hit
             if alignment.replace("-", "") != entrez_row.translation:
-                print(f"{alignment_id} differs on the sequence")  # TODO: log? Mejor forma de validacion?
+                print(f"{alignment_id} differs on the sequence")  # TODO: log? Mejor forma de validacion? 99 de identidad, 100 de cobertura
                 print(f"Alignment: {alignment.replace('-', '')}")
                 print(f"Translation: {entrez_row.translation}")
                 continue

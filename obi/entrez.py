@@ -35,7 +35,8 @@ class EntrezApiClient:
 
 
 class EntrezElement:
-    def __init__(self, uniprot_id, location, translation, sequence):
+    def __init__(self, uniprot_id, location, translation, sequence, locus_version):
+        self.locus_version = locus_version
         self.sequence = sequence
         self.translation = translation
         self.location = location
@@ -65,24 +66,21 @@ class EntrezDB:
                     raise InvalidEntrezIds("Sequence not found")
                 parsed_response.append(
                     EntrezElement(
-                        uniprot_id=self._uniprot_id(element['GBSeq_other-seqids'], ids_mapping),
+                        uniprot_id=self._uniprot_id(element['GBSeq_accession-version'], ids_mapping),
                         location=self._cds_location(element['GBSeq_feature-table']),
                         translation=self._entrez_translation(element['GBSeq_feature-table']),
-                        sequence=element['GBSeq_sequence'])
+                        sequence=element['GBSeq_sequence'],
+                        locus_version=element['GBSeq_accession-version']
+                    )
                 )
             except InvalidEntrezIds as e:
                 print(f"{self._uniprot_id(element['GBSeq_other-seqids'], ids_mapping)} {e}")
 
         return parsed_response
 
-    def _uniprot_id(self, sequence_ids, ids_mapping):
-        entrez_id = detect(
-            lambda seq_id: seq_id.startswith('ref|'),
-            sequence_ids,
-            if_not_none=lambda seq_id: seq_id.replace('ref|', '').replace('|', '')
-        )
+    def _uniprot_id(self, primary_accession, ids_mapping):
         return detect(
-            lambda id_mapping: entrez_id in id_mapping.to_id,
+            lambda id_mapping: primary_accession in id_mapping.to_id,
             ids_mapping, if_not_none=lambda id_mapping: id_mapping.from_id
         )
 
