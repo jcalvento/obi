@@ -50,7 +50,7 @@ class EntrezDB:
     def fetch_cds(self, ids_mapping):
         if not ids_mapping:
             raise InvalidEntrezIds("Empty ids lists")
-        entrez_ids = list(map(lambda id_mapping: id_mapping.to_id, ids_mapping))
+        entrez_ids = list(map(lambda id_mapping: id_mapping.to_id.split(".")[0], ids_mapping))
         try:
             entrez_response = self._entrez_api_client.efetch(entrez_ids)
         except urllib.error.HTTPError:
@@ -66,7 +66,7 @@ class EntrezDB:
                     raise InvalidEntrezIds("Sequence not found")
                 parsed_response.append(
                     EntrezElement(
-                        uniprot_id=self._uniprot_id(element['GBSeq_accession-version'], ids_mapping),
+                        uniprot_id=self._uniprot_id(element['GBSeq_locus'], ids_mapping),
                         location=self._cds_location(element['GBSeq_feature-table']),
                         translation=self._entrez_translation(element['GBSeq_feature-table']),
                         sequence=element['GBSeq_sequence'],
@@ -80,7 +80,7 @@ class EntrezDB:
 
     def _uniprot_id(self, primary_accession, ids_mapping):
         return detect(
-            lambda id_mapping: primary_accession in id_mapping.to_id,
+            lambda id_mapping: primary_accession in id_mapping.to_id.split(".")[0],
             ids_mapping, if_not_none=lambda id_mapping: id_mapping.from_id
         )
 

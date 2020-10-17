@@ -31,6 +31,7 @@ class NucleotideAligner:
                 print(f"{alignment_id} differs on the sequence")  # TODO: log? Mejor forma de validacion? 99 de identidad, 100 de cobertura
                 print(f"Alignment: {alignment.replace('-', '')}")
                 print(f"Translation: {entrez_row.translation}")
+                print(f"NCBI ID: {entrez_row.locus_version}")
                 continue
             adn_codons = self.__adn_codons(entrez_row)
             nucleotide_alignment = ''

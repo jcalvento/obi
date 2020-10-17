@@ -21,7 +21,7 @@ class PositiveSelectionReport:
             acc_number = detect(
                 lambda mapping: uniprot_id.startswith(mapping.from_id),
                 self._alignment_preparation_result.uniprot_entrez_mapping
-            ).to_id
+            ).to_id.split('.')[0]
             rows = []
             codons = self._alignment_preparation_result.codons_and_translations[uniprot_id]['codons']
             alignment_codons = [alignment[index:index + 3] for index in range(0, len(alignment), 3)]
