@@ -8,6 +8,24 @@ class NucleotideAlignerResult:
         self.nucleotide_alignment = nucleotide_alignment
         self.amino_acid_alignment = amino_acid_alignment
 
+    def codons_and_translations_of(self, uniprot_id):
+        alignment_key = detect(
+            lambda key: key.startswith(uniprot_id), self.codons_and_translations.keys()
+        )
+        return self.codons_and_translations[alignment_key]
+
+    def nucleotide_alignment_of(self, uniprot_id):
+        alignment_key = detect(
+            lambda key: key.startswith(uniprot_id), self.nucleotide_alignment.keys()
+        )
+        return self.nucleotide_alignment[alignment_key]
+
+    def amino_acid_alignment_of(self, uniprot_id):
+        alignment_key = detect(
+            lambda key: key.startswith(uniprot_id), self.amino_acid_alignment.keys()
+        )
+        return self.amino_acid_alignment[alignment_key]
+
 
 class NucleotideAligner:
     def protein_based_nucleotide_alignment(self, entrez_response, protein_alignment_path, results_dir):
@@ -27,7 +45,7 @@ class NucleotideAligner:
             alignment = alignments.get(alignment_id)
             if not alignment:
                 continue  # FIXME: Mandar a entrez solo los cabeza de grupo de cd hit
-            if alignment.replace("-", "") != entrez_row.translation:
+            if not self.__is_the_same_sequence(alignment, entrez_row.translation):
                 print(f"{alignment_id} differs on the sequence")  # TODO: log? Mejor forma de validacion? 99 de identidad, 100 de cobertura
                 print(f"Alignment: {alignment.replace('-', '')}")
                 print(f"Translation: {entrez_row.translation}")
@@ -48,10 +66,15 @@ class NucleotideAligner:
             nucleotide_alignments[alignment_id] = nucleotide_alignment
         return nucleotide_alignments
 
+    def __is_the_same_sequence(self, alignment, protein_sequence):
+        alignment_sequence = alignment.replace("-", "")
+        sequence_length = len(alignment_sequence)
+        return sequence_length == len(protein_sequence) and\
+            sum(1 for a, b in zip(alignment_sequence, protein_sequence) if a != b) * 100 / sequence_length <= 1
+
     def __adn_codons(self, entrez_row):
         init, end = entrez_row.location.split('..')
         adn_sequence = entrez_row.sequence[int(init) - 1:int(end) - 3]  # -3 removes stop codon
-        # TODO: Validar largo de la cadena con el resultado del blastcmd? Alignment podria agrega cosas al final
         adn_codons = [adn_sequence[index:index + 3] for index in range(0, len(adn_sequence), 3)]
         return adn_codons
 

@@ -1,18 +1,10 @@
 import os
-import pathlib
 
 from obi import cd_hit
 from obi.alignment_preparation import fasta_content
 from obi.cd_hit import replace_cluster_heads, CdHitReport
 from obi.utils import flat_map
-
-
-def get_resource(file_path):
-    return f"{str(pathlib.Path(__file__).parent.absolute())}/resources/{file_path}"
-
-
-def results_path(file_path):
-    return f"{str(pathlib.Path(__file__).parent.absolute())}/tests_result_files/{file_path}"
+from tests.utils import get_resource, results_path
 
 
 def uniprot_pdbs_mapping():
