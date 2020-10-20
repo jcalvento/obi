@@ -63,7 +63,7 @@ class EntrezDB:
         for element in entrez_response:
             try:
                 if not element.get('GBSeq_sequence'):
-                    raise InvalidEntrezIds("Sequence not found")
+                    raise InvalidEntrezIds("Sequence not found")  # TODO: Test validations
                 parsed_response.append(
                     EntrezElement(
                         uniprot_id=self._uniprot_id(element['GBSeq_locus'], ids_mapping),
@@ -74,7 +74,7 @@ class EntrezDB:
                     )
                 )
             except InvalidEntrezIds as e:
-                print(f"{self._uniprot_id(element['GBSeq_other-seqids'], ids_mapping)} {e}")
+                print(f"{self._uniprot_id(element['GBSeq_locus'], ids_mapping)} {e}")
 
         return parsed_response
 

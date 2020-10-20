@@ -2,6 +2,8 @@ import os
 
 from Bio.Blast import NCBIXML
 
+from obi.logger import logger
+
 
 class BlastResultsError(RuntimeError):
     def __init__(self, message):
@@ -11,8 +13,10 @@ class BlastResultsError(RuntimeError):
 class Blast:
     def __init__(self, db_path):
         self._db_path = db_path
+        self.__logger = None
 
     def run(self, input_fasta, results_dir):
+        self.__logger = logger(results_dir)
         blast_records = self.__blastp(input_fasta)
 
         protein_sequence = self.__query_sequence(input_fasta)
@@ -26,7 +30,9 @@ class Blast:
             lambda alignment: self.__meets_expected_criteria(protein_sequence, alignment), blast_records.alignments
         ))
         if not filtered_results:
-            raise BlastResultsError("There is none blast result that meets filtering criteria")
+            error_message = "There is none blast result that meets filtering criteria"
+            self.__logger.info(error_message)
+            raise BlastResultsError(error_message)
 
         return filtered_results
 

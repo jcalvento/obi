@@ -5,6 +5,7 @@ from shutil import copyfile
 from obi import cd_hit
 from obi.cd_hit import replace_cluster_heads
 from obi.entrez import EntrezDB
+from obi.logger import info
 from obi.nucleotide_aligner import NucleotideAligner
 from obi.uniprot_api import UniprotAPIClient
 
@@ -28,7 +29,7 @@ def fasta_content(fasta_file):
                 content[current_id] = {"header": line}
             else:
                 content[current_id].setdefault("sequence", "")
-                content[current_id]["sequence"] += line  # Con o sin enters? .replace('\n', '')
+                content[current_id]["sequence"] += line
     return content
 
 
@@ -86,7 +87,7 @@ class AlignmentPreparation:
 
     def __amino_acids_alignment(self, cd_hit_output_file):
         if len(self.__uniprot_ids) <= 1:
-            print(f"Not enough records to align {self.__uniprot_ids}")
+            info(f"Not enough records to align {self.__uniprot_ids}", self.__results_dir)
             clustal_output = f"{self.__results_dir}/clustalo_aligned.fasta"
             copyfile(self.__fasta_file, clustal_output)
         else:

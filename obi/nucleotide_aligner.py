@@ -1,3 +1,4 @@
+from obi.logger import logger
 from obi.utils import detect
 
 
@@ -28,7 +29,11 @@ class NucleotideAlignerResult:
 
 
 class NucleotideAligner:
+    def __init__(self):
+        self.__logger = None
+
     def protein_based_nucleotide_alignment(self, entrez_response, protein_alignment_path, results_dir):
+        self.__logger = logger(results_dir)
         alignments = self.__map_alignments_data(protein_alignment_path)
         nucleotide_alignments = self.__nucleotide_alignments(alignments, entrez_response)
         nucleotide_alignments_path = self.__write_results(nucleotide_alignments, results_dir)
@@ -46,10 +51,10 @@ class NucleotideAligner:
             if not alignment:
                 continue  # FIXME: Mandar a entrez solo los cabeza de grupo de cd hit
             if not self.__is_the_same_sequence(alignment, entrez_row.translation):
-                print(f"{alignment_id} differs on the sequence")
-                print(f"Alignment: {alignment.replace('-', '')}")
-                print(f"Translation: {entrez_row.translation}")
-                print(f"NCBI ID: {entrez_row.locus_version}")
+                self.__logger.info(f"{alignment_id} differs on the sequence")
+                self.__logger.info(f"Alignment: {alignment.replace('-', '')}")
+                self.__logger.info(f"Translation: {entrez_row.translation}")
+                self.__logger.info(f"NCBI ID: {entrez_row.locus_version}")
                 continue
             adn_codons = self.__adn_codons(entrez_row)
             nucleotide_alignment = ''

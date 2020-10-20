@@ -1,17 +1,16 @@
 import datetime
 import os
 
-from obi import utils
 from obi.blast import BlastResultsError, Blast
 from obi.entrez import InvalidEntrezIds
 from obi.obi_1 import Obi, HyphyError
-from obi.utils import create_results_dir
+from obi.utils import create_results_dir, root_path
 
 if __name__ == '__main__':
     init_time = datetime.datetime.now()
     print(f"Whole process init time: {init_time}")
     email = 'juliancalvento@gmail.com'
-    root_path = utils.root_path()
+    root_path = root_path()
     fastas_dir = f"{root_path}/fasta"
     files = os.listdir(fastas_dir)
     failed_count = 0

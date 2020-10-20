@@ -2,6 +2,7 @@ import json
 
 from obi.alignment_preparation import AlignmentPreparation
 from obi.hyphy import Hyphy
+from obi.logger import info
 from obi.positive_selection_report import PositiveSelectionReport
 from obi.sifts import Sifts
 
@@ -24,9 +25,11 @@ class Obi:
             fasta_file, self._results_dir, self._email, self._uniprot_pdb_csv_path
         ).run()
         if len(alignment_preparation_result.nucleotide_alignment) < 3:
-            raise HyphyError(f"Not enough nucleotide alignments for {self._results_dir.split('/')[-1]}, alignments: {len(alignment_preparation_result.nucleotide_alignment)}")
+            error_message = f"Not enough nucleotide alignments for {self._results_dir.split('/')[-1]}, alignments:" \
+                            f" {len(alignment_preparation_result.nucleotide_alignment)}"
+            info(error_message, self._results_dir)
+            raise HyphyError(error_message)
         hyphy_result = Hyphy(alignment_preparation_result.nucleotide_alignment_path).run(1000)
-        print(alignment_preparation_result.uniprot_pdb_mapping)
         sifts = Sifts()
         pdb_mappings = {}
         for uniprot_id, pdbs in alignment_preparation_result.uniprot_pdb_mapping.items():
