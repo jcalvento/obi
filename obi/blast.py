@@ -13,25 +13,23 @@ class BlastResultsError(RuntimeError):
 class Blast:
     def __init__(self, db_path):
         self._db_path = db_path
-        self.__logger = None
 
     def run(self, input_fasta, results_dir):
-        self.__logger = logger(results_dir)
-        blast_records = self.__blastp(input_fasta)
+        blast_records = self.__blast_records(input_fasta)
 
         protein_sequence = self.__query_sequence(input_fasta)
 
-        filtered_results = self.__filter_results(blast_records, protein_sequence)
+        filtered_results = self.__filter_results(blast_records, protein_sequence, logger(results_dir))
 
         return self.__make_fasta(results_dir, filtered_results)
 
-    def __filter_results(self, blast_records, protein_sequence):
+    def __filter_results(self, blast_records, protein_sequence, obi_logger):
         filtered_results = list(filter(
             lambda alignment: self.__meets_expected_criteria(protein_sequence, alignment), blast_records.alignments
         ))
         if not filtered_results:
             error_message = "There is none blast result that meets filtering criteria"
-            self.__logger.info(error_message)
+            obi_logger.info(error_message)
             raise BlastResultsError(error_message)
 
         return filtered_results
@@ -45,17 +43,17 @@ class Blast:
 
         return "".join(sequence).replace("\n", "")
 
-    def __blastp(self, input_fasta):
-        blast_result = os.popen(f'blastp -query {input_fasta} -db {self._db_path} -outfmt 5')
+    def __blast_records(self, input_fasta):
+        blast_result = self.__blastp(input_fasta)
         blast_records = NCBIXML.read(blast_result)
         return blast_records
 
+    def __blastp(self, input_fasta):
+        return os.popen(f'blastp -query {input_fasta} -db {self._db_path} -outfmt 5')
+
     def __evalue(self, alignment):
         hsp = alignment.hsps[0]
-        if hasattr(hsp, 'evalue'):
-            return hsp.evalue
-        else:
-            return 0
+        return hsp.expect
 
     def __identity_percentage(self, alignment):
         hsp = alignment.hsps[0]
@@ -73,6 +71,7 @@ class Blast:
     # porcentaje de identidad > 40%
     # coverage > 90% ((dfblst['q.end']-dfblst['q.start'])/query_length)*100.0
     # evalue < 0.005
+    # gaps < 6%
 
     def __make_fasta(self, results_dir, alignments):
         ids = ",".join(list(map(lambda alignment: alignment.hit_id.split('|')[1], alignments)))
