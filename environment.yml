@@ -1,7 +1,7 @@
 name: pruebas
 channels:
   - bioconda
-  - schrodinger
+  - anaconda
   - defaults
   - conda-force
 dependencies:
@@ -9,6 +9,7 @@ dependencies:
   - blas=1.0=mkl
   - cd-hit=4.8.1=hd9629dc_0
   - clustalo=1.2.3=0
+  - coverage=5.3=py37haf1e3a3_0
   - hyphy=2.5.8=h50e4897_1
   - iqtree=2.0.3=h7eed37d_0
   - pytest=5.2.4=py37_1
