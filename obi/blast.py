@@ -14,18 +14,18 @@ class Blast:
     def __init__(self, db_path):
         self._db_path = db_path
 
-    def run(self, input_fasta, results_dir):
+    def run(self, input_fasta, results_dir, min_identity=0.4, max_evalue=0.005, min_coverage=90, max_gaps=6):
         blast_records = self.__blast_records(input_fasta)
 
         protein_sequence = self.__query_sequence(input_fasta)
 
-        filtered_results = self.__filter_results(blast_records, protein_sequence, logger(results_dir))
+        filtered_results = self.__filter_results(blast_records, protein_sequence, logger(results_dir), min_identity, max_evalue, min_coverage, max_gaps)
 
         return self.__make_fasta(results_dir, filtered_results)
 
-    def __filter_results(self, blast_records, protein_sequence, obi_logger):
+    def __filter_results(self, blast_records, protein_sequence, obi_logger, min_identity, max_evalue, min_coverage, max_gaps):
         filtered_results = list(filter(
-            lambda alignment: self.__meets_expected_criteria(protein_sequence, alignment), blast_records.alignments
+            lambda alignment: self.__meets_expected_criteria(protein_sequence, alignment, min_identity, max_evalue, min_coverage, max_gaps), blast_records.alignments
         ))
         if not filtered_results:
             error_message = "There is none blast result that meets filtering criteria"
@@ -51,27 +51,26 @@ class Blast:
     def __blastp(self, input_fasta):
         return os.popen(f'blastp -query {input_fasta} -db {self._db_path} -outfmt 5')
 
-    def __evalue(self, alignment):
+    def _evalue(self, alignment):
         hsp = alignment.hsps[0]
         return hsp.expect
 
-    def __identity_percentage(self, alignment):
+    def _identity_percentage(self, alignment):
         hsp = alignment.hsps[0]
         return round(hsp.identities / hsp.align_length, 2)
 
-    def __coverage(self, protein_chain, alignment):
+    def _coverage(self, protein_chain, alignment):
         hsp = alignment.hsps[0]
         return ((hsp.query_end - hsp.query_start) / len(protein_chain)) * 100
 
-    def __meets_expected_criteria(self, protein_chain, alignment):
-        return self.__identity_percentage(alignment) >= 0.4 and self.__evalue(alignment) <= 0.005 and \
-               self.__coverage(protein_chain, alignment) >= 90
+    def _gaps_percentage(self, protein_chain, alignment):
+        hsp = alignment.hsps[0]
+        return (hsp.gaps / len(protein_chain)) * 100
 
-    # parametrizable pero defaults:
-    # porcentaje de identidad > 40%
-    # coverage > 90% ((dfblst['q.end']-dfblst['q.start'])/query_length)*100.0
-    # evalue < 0.005
-    # gaps < 6%
+    def __meets_expected_criteria(self, protein_chain, alignment, min_identity, max_evalue, min_coverage, max_gaps):
+        return self._identity_percentage(alignment) >= min_identity and self._evalue(alignment) <= max_evalue and \
+               self._coverage(protein_chain, alignment) >= min_coverage and\
+               self._gaps_percentage(protein_chain, alignment) <= max_gaps
 
     def __make_fasta(self, results_dir, alignments):
         ids = ",".join(list(map(lambda alignment: alignment.hit_id.split('|')[1], alignments)))
