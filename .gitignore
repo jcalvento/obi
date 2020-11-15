@@ -136,3 +136,5 @@ swissprot
 pdb_chain_uniprot.csv
 sifts
 tests/tests_result_files
+parse_csv.py
+proteina_protmiscuity.csv
