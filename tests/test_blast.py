@@ -11,9 +11,12 @@ from tests.utils import results_dir, get_resource
 class TestBlast:
     @fixture
     def blast(self):
-        return Blast(f'{root_path()}/swissprot/swissprot')
+        return Blast('mocked')
 
-    def test_when_there_are_no_results_for_the_given_id_it_returns_and_error(self, blast):
+    @mock.patch('obi.blast.Blast._Blast__blastp')
+    def test_when_there_are_no_results_for_the_given_id_it_returns_and_error(self, mock_blastp, blast):
+        mock_blastp.return_value = open(get_resource("blast_empty_results.xml"))
+
         try:
             blast.run(get_resource("invalid_blast_file.fasta"), results_dir())
             fail()
