@@ -16,6 +16,7 @@ jobs:
       - name: Installing Python requirements
         run: |
           conda env create --file environment.yml python=3.7
+          $(conda info --base)/etc/profile.d/conda.sh
           conda activate obi
       - name: Run tests
         run: pytest
