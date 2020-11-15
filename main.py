@@ -14,7 +14,7 @@ if __name__ == "__main__":
         '--email', help="Email to register while using Entrez"
     )
     parser.add_argument(
-        '--output-path', help='Directory where the program creates output files: ./results/<fasta-filename>'
+        '--output-path', help='Directory where the program creates output files. Default: ./results/<fasta-filename>'
     )
     parser.add_argument(
         '--blast',
@@ -23,7 +23,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    results_dir = create_results_dir(args.fasta)
+    results_dir = args.output_path or create_results_dir(args.fasta)
     blast = Blast(args.blast)
     pdb_uniprot_mapping = f"{root_path}/pdb_chain_uniprot.csv"
     obi_1 = Obi(
