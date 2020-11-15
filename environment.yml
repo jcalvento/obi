@@ -2,8 +2,8 @@ name: pruebas
 channels:
   - bioconda
   - anaconda
+  - conda-forge
   - defaults
-  - conda-force
 dependencies:
   - biopython=1.74=py37h1de35cc_0
   - blas=1.0=mkl
@@ -16,3 +16,4 @@ dependencies:
   - python=3.7.4=h359304d_1
   - requests=2.23.0
   - pytest-mock=3.3.1=py_0
+  - blast=2.10.1
