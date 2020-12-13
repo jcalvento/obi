@@ -24,6 +24,10 @@ class Obi:
         alignment_preparation_result = AlignmentPreparation(
             fasta_file, self._results_dir, self._email, self._uniprot_pdb_csv_path
         ).run()
+
+        return self.positive_selection_analysis(alignment_preparation_result)
+
+    def positive_selection_analysis(self, alignment_preparation_result):
         if len(alignment_preparation_result.nucleotide_alignment) < 3:
             error_message = f"Not enough nucleotide alignments for {self._results_dir.split('/')[-1]}, alignments:" \
                             f" {len(alignment_preparation_result.nucleotide_alignment)}"
@@ -41,4 +45,5 @@ class Obi:
         report = PositiveSelectionReport(alignment_preparation_result, hyphy_result, pdb_mappings).generate()
         with open(f"{self._results_dir}/positive_selection.json", "w") as f:
             f.write(json.dumps(report, indent=2))
+
         return report

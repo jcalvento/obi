@@ -13,7 +13,6 @@ dependencies:
   - hyphy=2.5.8
   - iqtree=2.0.3
   - pytest=5.2.4
-  - python=3.7.4
   - requests=2.23.0
   - pytest-mock=3.3.1
   - blast=2.10.1
