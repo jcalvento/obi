@@ -21,6 +21,11 @@ if __name__ == "__main__":
         help='Path to Blast Swissprot DB. Default: ./swissprot/swissprot',
         default=f'{root_path}/swissprot/swissprot'
     )
+    parser.add_argument(
+        '--include-analysis', help='If present, runs positive selection analysis, which includes running Hyphy and'
+                                   ' getting final results. If not present, result includes until nucleotide alignment',
+        action='store_true', default=False
+    )
     args = parser.parse_args()
 
     results_dir = args.output_path or create_results_dir(args.fasta)
@@ -32,7 +37,8 @@ if __name__ == "__main__":
 
     print(f"Init time: {datetime.datetime.now()}")
     try:
-        obi_1.run(args.fasta)
+        obi_1.run(args.fasta, args.include_analysis)
     except (BlastResultsError, HyphyError, InvalidEntrezIds) as e:
         print(e.message)
     print(f"Finish time: {datetime.datetime.now()}")
+    print(f"Results: {results_dir}")
