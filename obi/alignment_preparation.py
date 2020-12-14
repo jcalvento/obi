@@ -3,7 +3,7 @@ import json
 import subprocess
 from shutil import copyfile
 
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_load
 
 from obi import cd_hit
 from obi.cd_hit import replace_cluster_heads
@@ -39,9 +39,11 @@ def fasta_content(fasta_file):
 class AlignmentPreparationResultSchema(Schema):
     uniprot_entrez_mapping = fields.List(fields.Nested(UniprotIdMappingSchema()))
     uniprot_pdb_mapping = fields.Dict()
-    nucleotide_alignment_result = fields.Nested(
-        NucleotideAlignmentResultSchema()
-    )
+    nucleotide_alignment_result = fields.Nested(NucleotideAlignmentResultSchema())
+
+    @post_load
+    def deserialize(self, data, **kwargs):
+        return AlignmentPreparationResult(**data)
 
 
 class AlignmentPreparationResult:

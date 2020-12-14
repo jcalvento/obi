@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_load
 
 from obi.logger import logger
 from obi.utils import detect
@@ -9,6 +9,10 @@ class NucleotideAlignmentResultSchema(Schema):
     nucleotide_alignment_path = fields.Str()
     nucleotide_alignment = fields.Dict()
     amino_acid_alignment = fields.Dict()
+
+    @post_load
+    def deserialize(self, data, **kwargs):
+        return NucleotideAlignerResult(**data)
 
 
 class NucleotideAlignerResult:

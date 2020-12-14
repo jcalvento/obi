@@ -10,7 +10,7 @@ class TestEntrezDB:
         return EntrezDB('juliancalvento@gmail.com')
 
     def test_given_a_uniprot_refseq_mapping_when_it_fetches_the_cds_returns_the_location_transation_and_sequence(self, entrez_api):
-        mapping = UniprotIdMapping('O65493\tNM_119701.4')
+        mapping = UniprotIdMapping.for_tab_separated_ids('O65493\tNM_119701.4')
 
         entrez_response = entrez_api.fetch_cds([mapping])
 
@@ -41,8 +41,8 @@ class TestEntrezDB:
         assert 'NM_119701.4' == entrez_mapping.locus_version
 
     def test_given_two_uniprot_refseq_mapping_when_it_fetches_the_cds_returns_results_for_both(self, entrez_api):
-        mapping = UniprotIdMapping('O65493\tNM_119701.4')
-        another_mapping = UniprotIdMapping('Q9LM66\tNM_101938.5')
+        mapping = UniprotIdMapping.for_tab_separated_ids('O65493\tNM_119701.4')
+        another_mapping = UniprotIdMapping.for_tab_separated_ids('Q9LM66\tNM_101938.5')
 
         entrez_response = entrez_api.fetch_cds([mapping, another_mapping])
 
