@@ -3,7 +3,8 @@ import os
 
 from obi.blast import BlastResultsError, Blast
 from obi.entrez import InvalidEntrezIds
-from obi.obi_1 import Obi, HyphyError
+from obi.obi_1 import Obi
+from obi.positive_selection import HyphyError
 from obi.utils import create_results_dir, root_path
 
 if __name__ == '__main__':

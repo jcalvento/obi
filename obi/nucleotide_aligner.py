@@ -1,5 +1,14 @@
+from marshmallow import Schema, fields
+
 from obi.logger import logger
 from obi.utils import detect
+
+
+class NucleotideAlignmentResultSchema(Schema):
+    codons_and_translations = fields.Dict()
+    nucleotide_alignment_path = fields.Str()
+    nucleotide_alignment = fields.Dict()
+    amino_acid_alignment = fields.Dict()
 
 
 class NucleotideAlignerResult:

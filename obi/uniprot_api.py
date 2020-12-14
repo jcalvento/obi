@@ -1,10 +1,16 @@
 import requests
+from marshmallow import Schema, fields
 
 
 def parse_response(uniprot_response):
     return list(map(
         lambda result_line: UniprotIdMapping(result_line), uniprot_response.text.split("\n")[1:-1]
     ))
+
+
+class UniprotIdMappingSchema(Schema):
+    from_id = fields.Str()
+    to_id = fields.Str()
 
 
 class UniprotIdMapping:

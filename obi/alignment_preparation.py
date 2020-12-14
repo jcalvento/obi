@@ -1,13 +1,16 @@
 import csv
+import json
 import subprocess
 from shutil import copyfile
+
+from marshmallow import Schema, fields
 
 from obi import cd_hit
 from obi.cd_hit import replace_cluster_heads
 from obi.entrez import EntrezDB
 from obi.logger import info
-from obi.nucleotide_aligner import NucleotideAligner
-from obi.uniprot_api import UniprotAPIClient
+from obi.nucleotide_aligner import NucleotideAligner, NucleotideAlignmentResultSchema
+from obi.uniprot_api import UniprotAPIClient, UniprotIdMappingSchema
 
 
 def parse_uniprot_ids(fasta_file):
@@ -33,27 +36,35 @@ def fasta_content(fasta_file):
     return content
 
 
+class AlignmentPreparationResultSchema(Schema):
+    uniprot_entrez_mapping = fields.List(fields.Nested(UniprotIdMappingSchema()))
+    uniprot_pdb_mapping = fields.Dict()
+    nucleotide_alignment_result = fields.Nested(
+        NucleotideAlignmentResultSchema()
+    )
+
+
 class AlignmentPreparationResult:
     def __init__(self, nucleotide_alignment_result, uniprot_pdb_mapping, uniprot_entrez_mapping):
         self.uniprot_entrez_mapping = uniprot_entrez_mapping
         self.uniprot_pdb_mapping = uniprot_pdb_mapping
-        self.__nucleotide_alignment_result = nucleotide_alignment_result
+        self.nucleotide_alignment_result = nucleotide_alignment_result
 
     @property
     def nucleotide_alignment(self):
-        return self.__nucleotide_alignment_result.nucleotide_alignment
+        return self.nucleotide_alignment_result.nucleotide_alignment
 
     @property
     def amino_acid_alignment(self):
-        return self.__nucleotide_alignment_result.amino_acid_alignment
+        return self.nucleotide_alignment_result.amino_acid_alignment
 
     @property
     def codons_and_translations(self):
-        return self.__nucleotide_alignment_result.codons_and_translations
+        return self.nucleotide_alignment_result.codons_and_translations
 
     @property
     def nucleotide_alignment_path(self):
-        return self.__nucleotide_alignment_result.nucleotide_alignment_path
+        return self.nucleotide_alignment_result.nucleotide_alignment_path
 
 
 class AlignmentPreparation:
@@ -75,7 +86,11 @@ class AlignmentPreparation:
             entrez_response, clustal_output, self.__results_dir
         )
 
-        return AlignmentPreparationResult(nucleotide_alignment_result, uniprot_pds_mapping, uniprot_entrez_mapping)
+        result = AlignmentPreparationResult(nucleotide_alignment_result, uniprot_pds_mapping, uniprot_entrez_mapping)
+        with open(f"{self.__results_dir}/alignment_preparation_result.json", "w") as f:
+            f.write(json.dumps(AlignmentPreparationResultSchema().dump(result), indent=2))
+
+        return result
 
     def __cd_hit(self, uniprot_pds_mapping):
         cd_hit_output_file = f'{self.__results_dir}/cd_hit'

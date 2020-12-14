@@ -1,4 +1,37 @@
+import json
+
+from obi.hyphy import Hyphy
+from obi.logger import info
+from obi.sifts import Sifts
 from obi.utils import detect, get_element
+
+
+class HyphyError(RuntimeError):
+    def __init__(self, message):
+        self.message = message
+
+
+class PositiveSelection:
+    def analyse(self, results_dir, alignment_preparation_result):
+        if len(alignment_preparation_result.nucleotide_alignment) < 3:
+            error_message = f"Not enough nucleotide alignments for {results_dir.split('/')[-1]}, alignments:" \
+                            f" {len(alignment_preparation_result.nucleotide_alignment)}"
+            info(error_message, results_dir)
+            raise HyphyError(error_message)
+        hyphy_result = Hyphy(alignment_preparation_result.nucleotide_alignment_path).run(1000)
+        sifts = Sifts()
+        pdb_mappings = {}
+        for uniprot_id, pdbs in alignment_preparation_result.uniprot_pdb_mapping.items():
+            pdbs_data = list(map(
+                lambda pdb_id: sifts.map_to(pdb_id),
+                pdbs
+            ))
+            pdb_mappings[uniprot_id] = pdbs_data
+        report = PositiveSelectionReport(alignment_preparation_result, hyphy_result, pdb_mappings).generate()
+        with open(f"{results_dir}/positive_selection.json", "w") as f:
+            f.write(json.dumps(report, indent=2))
+
+        return report
 
 
 class PositiveSelectionReport:
