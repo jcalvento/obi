@@ -9,8 +9,12 @@ class Obi:
         self._blast = blast
         self._uniprot_pdb_csv_path = uniprot_pdb_csv_path
 
-    def run(self, input_fasta_file, include_analysis=True):
-        fasta_file = self._blast.run(input_fasta_file, self._results_dir)
+    def run(self, input_fasta_file, include_analysis=True, min_identity=None, max_evalue=None, min_coverage=None,
+            max_gaps=None):
+        fasta_file = self._blast.run(
+            input_fasta_file, self._results_dir, min_identity=min_identity,
+            max_evalue=max_evalue, min_coverage=min_coverage, max_gaps=max_gaps
+        )
         alignment_preparation_result = AlignmentPreparation(
             fasta_file, self._results_dir, self._email, self._uniprot_pdb_csv_path
         ).run()
