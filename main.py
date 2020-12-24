@@ -59,8 +59,8 @@ if __name__ == "__main__":
     print(f"Init time: {datetime.datetime.now()}")
     try:
         obi_1.run(
-            args.fasta, args.include_analysis, min_identity=args.min_identity,
-            max_evalue=args.max_evalue, min_coverage=args.min_coverage, max_gaps=args.max_gaps
+            args.fasta, args.include_analysis, min_identity=float(args.min_identity),
+            max_evalue=float(args.max_evalue), min_coverage=float(args.min_coverage), max_gaps=int(args.max_gaps)
         )
     except (BlastResultsError, HyphyError, InvalidEntrezIds) as e:
         print(e.message)
