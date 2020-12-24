@@ -18,7 +18,10 @@ def root_path():
 
 def create_results_dir(file, root=root_path()):
     filename = file.split('/')[-1].split('.')[0]
-    dir_path = f'{root}/results/{filename}'
+    results_dir = f'{root}/results'
+    dir_path = f'{results_dir}/{filename}'
+    if not os.path.isdir(results_dir):
+        os.mkdir(results_dir)
     if os.path.isdir(dir_path):
         shutil.rmtree(dir_path)
     if not os.path.isdir(dir_path):
