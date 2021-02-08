@@ -69,6 +69,8 @@ class Hyphy:
 #  Para usar este metodo, tener en cuenta servicio donde subir el archivo
 # https://github.com/espebra/filebin#web-service
 # https://gofile.io/welcome
+# Hyphy API https://github.com/veg/datamonkey-js/wiki/API-Submit
+# El token es a mano, tendria que pedirlo por param
 if __name__ == '__main__':
     # Hyphy("/Users/julian/Documents/UNQ/tesis/pruebas/results/P00766/nucleotide_alignment.fasta").check_status()
     Hyphy("/Users/julian/Documents/UNQ/tesis/pruebas/results/P00766/nucleotide_alignment.fasta").run()
