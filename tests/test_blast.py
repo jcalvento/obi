@@ -4,7 +4,6 @@ from pytest import fixture, fail
 from pytest_mock import mock
 
 from obi.blast import Blast, BlastResultsError
-from obi.utils import root_path
 from tests.utils import results_dir, get_resource
 
 
