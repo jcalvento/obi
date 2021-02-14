@@ -4,7 +4,7 @@ import datetime
 from obi.blast import Blast, BlastResultsError
 from obi.entrez import InvalidEntrezIds
 from obi.obi_1 import Obi
-from obi.positive_selection import HyphyError
+from obi.positive_selection import HyphyError, PositiveSelectionAnalyzer
 from obi.utils import create_results_dir, root_path
 
 if __name__ == "__main__":
@@ -46,6 +46,11 @@ if __name__ == "__main__":
         '--include-analysis', help='If present, runs positive selection analysis, which includes running Hyphy and'
                                    ' getting final results. If not present, result includes until nucleotide alignment',
         action='store_true', default=False
+    )
+    parser.add_argument(
+        '--mode', help='Only used when --include-analysis is present. '
+                       '"local" if you want to run Hyphy locally, "remote" to use Datamonkey instead. Default: local',
+        default=PositiveSelectionAnalyzer.LOCAL_MODE
     )
     args = parser.parse_args()
 

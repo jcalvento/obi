@@ -1,6 +1,8 @@
 import json
+from abc import abstractmethod
 from functools import reduce
 
+from obi.alignment_preparation import AlignmentPreparationResultSchema
 from obi.hyphy import Hyphy
 from obi.logger import info
 from obi.sifts import Sifts
@@ -12,14 +14,30 @@ class HyphyError(RuntimeError):
         self.message = message
 
 
-class PositiveSelection:
-    def analyse(self, results_dir, alignment_preparation_result):
-        self._validate_alignments(alignment_preparation_result, results_dir)
-        hyphy_result = Hyphy(alignment_preparation_result.nucleotide_alignment_path).run(1000)
-        pdb_mappings = self._map_uniprot_to_pdb(alignment_preparation_result)
-        report = self._generate_report(alignment_preparation_result, hyphy_result, pdb_mappings, results_dir)
+class PositiveSelectionAnalyzer:
+    LOCAL_MODE = "local"
+    REMOTE_MODE = "remote"
 
-        return report
+    @classmethod
+    def remote(cls):
+        return RemoteAnalyzer()
+
+    @classmethod
+    @abstractmethod
+    def suits_mode(cls, mode):
+        pass
+
+    @classmethod
+    def for_mode(cls, mode):
+        return detect(lambda subclass: subclass.suits_mode(mode.lower()), cls.__subclasses__(), default=LocalAnalyzer)()
+
+    def analyse(self, results_dir, alignment_preparation_result, api_key=None, email=None):
+        self._validate_alignments(alignment_preparation_result, results_dir)
+        return self._run_analysis(results_dir, alignment_preparation_result, api_key, email)
+
+    @abstractmethod
+    def _run_analysis(self, results_dir, alignment_preparation_result, api_key, email):
+        pass
 
     def _generate_report(self, alignment_preparation_result, hyphy_result, pdb_mappings, results_dir):
         report = PositiveSelectionReport(alignment_preparation_result, hyphy_result, pdb_mappings).generate()
@@ -45,6 +63,52 @@ class PositiveSelection:
                             f" {len(alignment_preparation_result.nucleotide_alignment)}"
             info(error_message, results_dir)
             raise HyphyError(error_message)
+
+    def _process_hyphy_result_and_generate_report(self, alignment_preparation_result, hyphy_result, results_dir):
+        pdb_mappings = self._map_uniprot_to_pdb(alignment_preparation_result)
+        report = self._generate_report(alignment_preparation_result, hyphy_result, pdb_mappings, results_dir)
+
+        return report
+
+
+class LocalAnalyzer(PositiveSelectionAnalyzer):
+    @classmethod
+    def suits_mode(cls, mode):
+        return mode == cls.LOCAL_MODE
+
+    def _run_analysis(self, results_dir, alignment_preparation_result, api_key, email):
+        hyphy_result = Hyphy.local().run(
+            alignment_preparation_result.nucleotide_alignment_path, api_key=api_key, email=email, bootstrap=1000
+        )
+
+        return self._process_hyphy_result_and_generate_report(alignment_preparation_result, hyphy_result, results_dir)
+
+
+class RemoteAnalyzer(PositiveSelectionAnalyzer):
+    def __init__(self):
+        self._hyphy = Hyphy.remote()
+
+    @classmethod
+    def suits_mode(cls, mode):
+        return mode == cls.REMOTE_MODE
+
+    def _run_analysis(self, results_dir, alignment_preparation_result, api_key, email):
+        hyphy_result = self._hyphy.run(
+            alignment_preparation_result.nucleotide_alignment_path, api_key=api_key, email=email, bootstrap=1000
+        )
+
+        with open(f"{results_dir}/datamonkey_response.json", "w") as f:
+            f.write(json.dumps(hyphy_result, indent=2))
+        print(f"Job queued in Datamonkey: {hyphy_result}")
+
+    def resume(self, results_dir, alignment_preparation_result):
+        with open(f"{results_dir}/datamonkey_response.json", "r") as f:
+            job_data = json.load(f)
+            hyphy_result = self._hyphy.job_result(results_dir, job_data['id'])
+
+            return self._process_hyphy_result_and_generate_report(
+                alignment_preparation_result, hyphy_result, results_dir
+            )
 
 
 class PositiveSelectionReport:
@@ -99,3 +163,11 @@ class PositiveSelectionReport:
                 row['index'] = index
                 positive_selection_rows.append(row)
         return positive_selection_rows
+
+
+if __name__ == '__main__':
+    input_path = "/Users/julian/Documents/UNQ/tesis/pruebas/results/P00784"
+    with open("%s/alignment_preparation_result.json" % input_path, 'r') as file_content:
+        data = json.load(file_content)
+        alignment_preparation_result = AlignmentPreparationResultSchema().load(data)
+        PositiveSelectionAnalyzer.remote().resume(input_path, alignment_preparation_result)

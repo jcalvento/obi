@@ -160,3 +160,5 @@ En los mmas parecidos difieren en 1 porque cambia un aminoacido por su substitut
 Uniprot devuelve versiones de entrez viejas que pueden diferir con las cadenas de blast, si no se le manda el version, entrez devuelve la ultima por default
 
 Probar blast desde conda https://anaconda.org/bioconda/blast
+
+Hyphy API https://github.com/veg/datamonkey-js/wiki/API-Submit

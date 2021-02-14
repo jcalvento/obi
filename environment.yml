@@ -17,3 +17,6 @@ dependencies:
   - pytest-mock=3.3.1
   - blast=2.10.1
   - marshmallow=3.9.1
+  - pip
+  - pip:
+    - pytest-recording

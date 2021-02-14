@@ -9,7 +9,7 @@ from tests.utils import get_resource, results_dir
 class TestObi:
     @mock.patch('obi.blast.Blast.run')
     @mock.patch('obi.alignment_preparation.AlignmentPreparation.run')
-    @mock.patch('obi.positive_selection.PositiveSelection.analyse')
+    @mock.patch('obi.positive_selection.PositiveSelectionAnalyzer.analyse')
     def test_when_include_analysis_is_false_it_does_not_run_analysis_generation(self, mock_positive_selection,
                                                                                 mock_alignment_preparation,
                                                                                 mock_blast_run):
@@ -29,7 +29,7 @@ class TestObi:
 
     @mock.patch('obi.blast.Blast.run')
     @mock.patch('obi.alignment_preparation.AlignmentPreparation.run')
-    @mock.patch('obi.positive_selection.PositiveSelection.analyse')
+    @mock.patch('obi.positive_selection.PositiveSelectionAnalyzer.analyse')
     def test_when_include_analysis_is_true_it_runs_analysis_generation(self, mock_positive_selection, mock_alignment_preparation, mock_blast_run):
         blast_result = get_resource("valid_blast.fasta")
         mock_blast_run.return_value = blast_result
@@ -49,7 +49,7 @@ class TestObi:
 
     @mock.patch('obi.blast.Blast.run')
     @mock.patch('obi.alignment_preparation.AlignmentPreparation.run')
-    @mock.patch('obi.positive_selection.PositiveSelection.analyse')
+    @mock.patch('obi.positive_selection.PositiveSelectionAnalyzer.analyse')
     def test_when_blast_params_are_included_it_forwards_them_to_blast(self, mock_positive_selection, mock_alignment_preparation, mock_blast_run):
         blast_result = get_resource("valid_blast.fasta")
         mock_blast_run.return_value = blast_result
