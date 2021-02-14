@@ -1,34 +1,30 @@
 import json
 import os
 import subprocess
+from abc import abstractmethod
 from functools import reduce
+
+import requests
 
 
 class Hyphy:
-    def __init__(self, nucleotide_alignment_path):
-        self._nucleotide_alignment_path = nucleotide_alignment_path
+    @staticmethod
+    def local():
+        return LocalHyphy()
 
-    def run(self, bootstrap=1000):
-        tree_path = self._generate_tree(bootstrap)
-        self._hyphy(tree_path)
+    @staticmethod
+    def remote():
+        return RemoteHyphy()
 
-        return self._parsed_response()
+    @abstractmethod
+    def run(self, *args):
+        pass
 
-    def _generate_tree(self, boostrap):
-        os.popen(f'iqtree -s {self._nucleotide_alignment_path} -bb {boostrap}').read()
-
-        return f'{self._nucleotide_alignment_path}.treefile'
-
-    def _hyphy(self, tree_path):
-        subprocess.call(['hyphy', 'meme', '--alignment', self._nucleotide_alignment_path, '-bb', tree_path])
-
-    def _parsed_response(self):
-        with open(self._nucleotide_alignment_path + ".MEME.json", 'r') as hyphy_result:
-            data = json.load(hyphy_result)
-            mle_report = data['MLE']
-            content = mle_report['content']['0']  # puede haber más de 1?
-            headers = mle_report['headers']
-            return list(map(lambda row: self._hyphy_row(row, headers), content))
+    def _parsed_response(self, data):
+        mle_report = data['MLE']
+        content = mle_report['content']['0']
+        headers = mle_report['headers']
+        return list(map(lambda row: self._hyphy_row(row, headers), content))
 
     def _hyphy_row(self, row, headers):
         def map_headers_with_row(result, index_header):
@@ -38,3 +34,104 @@ class Hyphy:
             return result
 
         return reduce(map_headers_with_row, enumerate(headers), {})
+
+
+class LocalHyphy(Hyphy):
+    def run(self, nucleotide_alignment_path, api_key=None, email=None, bootstrap=1000):
+        tree_path = self._generate_tree(nucleotide_alignment_path, bootstrap)
+        self._hyphy(nucleotide_alignment_path, tree_path)
+
+        with open(nucleotide_alignment_path + ".MEME.json", 'r') as hyphy_result:
+            data = json.load(hyphy_result)
+
+            return self._parsed_response(data)
+
+    def _generate_tree(self, nucleotide_alignment_path, bootstrap):
+        os.popen(f'iqtree -s {nucleotide_alignment_path} -bb {bootstrap}').read()
+
+        return f'{nucleotide_alignment_path}.treefile'
+
+    def _hyphy(self, nucleotide_alignment_path, tree_path):
+        subprocess.call(['hyphy', 'meme', '--alignment', nucleotide_alignment_path, '-bb', tree_path])
+
+
+class RemoteHyphy(Hyphy):
+    DATAMONKEY_BASE_URL = "http://datamonkey.org/api/v1"
+
+    def run(self, nucleotide_alignment_path, api_key, email, bootstrap=None):
+        self._validate_params(api_key, email)
+        file_url = upload(nucleotide_alignment_path)
+        url = f'{self.DATAMONKEY_BASE_URL}/submit'
+        body = {
+            'api_key': api_key,
+            "method": "MEME",
+            "fastaLoc": file_url,
+            "mail": email,
+            "gencodeid": "Universal",
+            "fileExtension": "fasta"
+        }
+        response = requests.post(url, json=body)
+
+        return response.json()
+
+    def job_result(self, results_dir, job_id):
+        response = requests.get('http://datamonkey.org/api/v1/status', json={'method': 'MEME', 'id': job_id})
+        data = response.json()
+
+        if data['status'] == 'completed':
+            analysis_content = requests.get(f"http://{data['url']}/results").json()
+
+            with open(f"{results_dir}/nucleotide_alignment.fasta.MEME.json", "w") as f:
+                f.write(json.dumps(analysis_content, indent=2))
+
+            return self._parsed_response(analysis_content)
+        else:
+            raise HyphyJobNotReady(f"Job {job_id} is not ready, status: {data['status']}. Try again later.")
+
+    def _key_info(self, api_key):
+        response = requests.post(f"{self.DATAMONKEY_BASE_URL}/keyinfo", {'api_key': api_key})
+
+        if response.status_code != 200:
+            raise HyphyAPIError(f"Datamonkey API failed: {response.text}")
+        return response.json()
+
+    def _validate_params(self, api_key, email):
+        if not api_key:
+            raise InvalidApiKeyError("API Key is required to submit a remote job")
+
+        if not email:
+            raise HyphyAPIError("Email is required to submit a remote job")
+
+        key_info = self._key_info(api_key)
+        if key_info["job_remaining"] == 0:
+            raise InvalidApiKeyError(f"Key {api_key} expired, to get a new one http://datamonkey.org/apiKey")
+
+
+class HyphyJobNotReady(RuntimeError):
+    def __init__(self, message):
+        self.message = message
+
+
+class InvalidApiKeyError(RuntimeError):
+    def __init__(self, message):
+        self.message = message
+
+
+class HyphyAPIError(RuntimeError):
+    def __init__(self, message):
+        self.message = message
+
+
+def upload(file_path):
+    # https://github.com/espebra/filebin#web-service
+    with open(file_path, "r") as f:
+        content = f.read()
+        response = requests.post(
+            url='https://filebin.net/',
+            data=content,
+            headers={'Content-Type': 'application/octet-stream', 'filename': f.name.split("/")[-1]}
+        )
+        link = response.json()['links'][0]['href']
+        html = requests.get(link).text
+        html_link = link + '?t='
+        return html[html.find(html_link):html.find(html_link) + len(html_link) + 8]
