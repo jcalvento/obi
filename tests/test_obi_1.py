@@ -45,7 +45,9 @@ class TestObi:
         mock_blast_run.assert_called_once_with(input_fasta, results_dir(), min_identity=None,
                                                max_evalue=None, min_coverage=None, max_gaps=None)
         mock_alignment_preparation.assert_called_once()
-        mock_positive_selection.assert_called_once_with(results_dir(), alignment_preparation_result)
+        mock_positive_selection.assert_called_once_with(
+            results_dir(), alignment_preparation_result, api_key=None, email=email
+        )
 
     @mock.patch('obi.blast.Blast.run')
     @mock.patch('obi.alignment_preparation.AlignmentPreparation.run')

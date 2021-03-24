@@ -10,7 +10,7 @@ class Obi:
         self._uniprot_pdb_csv_path = uniprot_pdb_csv_path
 
     def run(self, input_fasta_file, include_analysis=True, min_identity=None, max_evalue=None, min_coverage=None,
-            max_gaps=None, mode=PositiveSelectionAnalyzer.LOCAL_MODE):
+            max_gaps=None, mode=PositiveSelectionAnalyzer.LOCAL_MODE, api_key=None):
         fasta_file = self._blast.run(
             input_fasta_file, self._results_dir, min_identity=min_identity,
             max_evalue=max_evalue, min_coverage=min_coverage, max_gaps=max_gaps
@@ -21,6 +21,6 @@ class Obi:
 
         if include_analysis:
             return PositiveSelectionAnalyzer.for_mode(mode).analyse(
-                self._results_dir, alignment_preparation_result
+                self._results_dir, alignment_preparation_result, api_key=api_key, email=self._email
             )
         print("Positive selection analysis skipped")

@@ -52,6 +52,9 @@ if __name__ == "__main__":
                        '"local" if you want to run Hyphy locally, "remote" to use Datamonkey instead. Default: local',
         default=PositiveSelectionAnalyzer.LOCAL_MODE
     )
+    parser.add_argument(
+        "--api-key", help='Required when running in remote mode. To get one go to http://datamonkey.org/apiKey'
+    )
     args = parser.parse_args()
 
     results_dir = args.output_path or create_results_dir(args.fasta)
@@ -65,7 +68,8 @@ if __name__ == "__main__":
     try:
         obi_1.run(
             args.fasta, args.include_analysis, min_identity=float(args.min_identity),
-            max_evalue=float(args.max_evalue), min_coverage=float(args.min_coverage), max_gaps=int(args.max_gaps)
+            max_evalue=float(args.max_evalue), min_coverage=float(args.min_coverage),
+            max_gaps=int(args.max_gaps), mode=args.mode, api_key=args.api_key
         )
     except (BlastResultsError, HyphyError, InvalidEntrezIds) as e:
         print(e.message)
