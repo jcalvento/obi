@@ -1,5 +1,5 @@
-from obi.alignment_preparation import AlignmentPreparation
-from obi.positive_selection import PositiveSelectionAnalyzer
+from src.obi.alignment_preparation import AlignmentPreparation
+from src.obi.positive_selection import PositiveSelectionAnalyzer
 
 
 class Obi:

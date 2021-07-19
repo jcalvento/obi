@@ -1,6 +1,6 @@
-from obi.entrez import EntrezElement
-from obi.nucleotide_aligner import NucleotideAligner
-from obi.utils import detect
+from src.obi.entrez import EntrezElement
+from src.obi.nucleotide_aligner import NucleotideAligner
+from src.obi.utils import detect
 from tests.utils import get_resource, results_path
 
 

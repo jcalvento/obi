@@ -3,7 +3,7 @@ from datetime import datetime
 
 from Bio import Entrez
 
-from obi.utils import detect
+from src.obi.utils import detect
 
 
 class InvalidEntrezIds(RuntimeError):

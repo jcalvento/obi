@@ -3,7 +3,7 @@ import os
 from pytest import fixture, fail
 from pytest_mock import mock
 
-from obi.blast import Blast, BlastResultsError
+from src.obi.blast import Blast, BlastResultsError
 from tests.utils import results_dir, get_resource
 
 
@@ -12,7 +12,7 @@ class TestBlast:
     def blast(self):
         return Blast('mocked')
 
-    @mock.patch('obi.blast.Blast._Blast__blastp')
+    @mock.patch('src.obi.blast.Blast._Blast__blastp')
     def test_when_there_are_no_results_for_the_given_id_it_returns_and_error(self, mock_blastp, blast):
         mock_blastp.return_value = open(get_resource("blast_empty_results.xml"))
 
@@ -22,7 +22,7 @@ class TestBlast:
         except BlastResultsError as e:
             assert e.message == "There is none blast result that meets filtering criteria"
 
-    @mock.patch('obi.blast.Blast._Blast__blastp')
+    @mock.patch('src.obi.blast.Blast._Blast__blastp')
     def test_when_there_is_a_result_but_its_evalue_is_higher_than_required_it_is_not_included_on_the_result(self, mock_blastp, blast):
         mock_blastp.return_value = open(get_resource("blast_high_evalue.xml"))
 
@@ -32,7 +32,7 @@ class TestBlast:
         except BlastResultsError as e:
             assert e.message == "There is none blast result that meets filtering criteria"
 
-    @mock.patch('obi.blast.Blast._Blast__blastp')
+    @mock.patch('src.obi.blast.Blast._Blast__blastp')
     def test_when_there_is_a_result_but_its_coverage_is_less_than_required_it_is_not_included_on_the_result(self, mock_blastp, blast):
         mock_blastp.return_value = open(get_resource("blast_low_coverage.xml"))
 
@@ -42,7 +42,7 @@ class TestBlast:
         except BlastResultsError as e:
             assert e.message == "There is none blast result that meets filtering criteria"
 
-    @mock.patch('obi.blast.Blast._Blast__blastp')
+    @mock.patch('src.obi.blast.Blast._Blast__blastp')
     def test_when_there_is_a_result_but_its_identity_is_less_than_required_it_is_not_included_on_the_result(self, mock_blastp, blast):
         mock_blastp.return_value = open(get_resource("blast_low_identity.xml"))
 
@@ -52,7 +52,7 @@ class TestBlast:
         except BlastResultsError as e:
             assert e.message == "There is none blast result that meets filtering criteria"
 
-    @mock.patch('obi.blast.Blast._Blast__blastp')
+    @mock.patch('src.obi.blast.Blast._Blast__blastp')
     def test_when_there_is_a_result_but_its_gap_percentage_is_higher_than_required_it_is_not_included_on_the_result(self, mock_blastp, blast):
         mock_blastp.return_value = open(get_resource("blast_with_gaps.xml"))
 
@@ -62,8 +62,8 @@ class TestBlast:
         except BlastResultsError as e:
             assert e.message == "There is none blast result that meets filtering criteria"
 
-    @mock.patch('obi.blast.Blast._Blast__blastp')
-    @mock.patch('obi.blast.Blast._Blast__blastdbcmd')
+    @mock.patch('src.obi.blast.Blast._Blast__blastp')
+    @mock.patch('src.obi.blast.Blast._Blast__blastdbcmd')
     def test_when_there_are_valid_results_it_returns_the_path_of_the_resulting_fasta_with_the_sequences_that_meet_the_criteria(self, mock_blastdbcmd, mock_blastp, blast):
         mock_blastp.return_value = open(get_resource("blastp_result.xml"))
         mock_blastdbcmd.return_value = open(get_resource("blastcmd_result.fasta")).read()

@@ -5,7 +5,7 @@ from contextlib import closing
 from urllib import request
 from xml.etree import ElementTree
 
-from obi.utils import root_path
+from src.obi.utils import root_path
 
 
 def _create_results_dir(pdb_root_id):

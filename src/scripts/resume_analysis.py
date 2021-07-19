@@ -1,9 +1,9 @@
 import argparse
 import json
 
-from obi.alignment_preparation import AlignmentPreparationResultSchema
-from obi.hyphy import HyphyJobNotReady
-from obi.positive_selection import PositiveSelectionAnalyzer
+from src.obi.alignment_preparation import AlignmentPreparationResultSchema
+from src.obi.hyphy import HyphyJobNotReady
+from src.obi.positive_selection import PositiveSelectionAnalyzer
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

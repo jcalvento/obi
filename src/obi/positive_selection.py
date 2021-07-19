@@ -2,11 +2,11 @@ import json
 from abc import abstractmethod
 from functools import reduce
 
-from obi.alignment_preparation import AlignmentPreparationResultSchema
-from obi.hyphy import Hyphy
-from obi.logger import info
-from obi.sifts import Sifts
-from obi.utils import detect, get_element
+from src.obi.alignment_preparation import AlignmentPreparationResultSchema
+from src.obi.hyphy import Hyphy
+from src.obi.logger import info
+from src.obi.sifts import Sifts
+from src.obi.utils import detect, get_element
 
 
 class HyphyError(RuntimeError):
@@ -166,7 +166,7 @@ class PositiveSelectionReport:
 
 
 if __name__ == '__main__':
-    input_path = "/Users/julian/Documents/UNQ/tesis/pruebas/results/P00784"
+    input_path = "/results/P00784"
     with open("%s/alignment_preparation_result.json" % input_path, 'r') as file_content:
         data = json.load(file_content)
         alignment_preparation_result = AlignmentPreparationResultSchema().load(data)
