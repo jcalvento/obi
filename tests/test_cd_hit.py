@@ -1,9 +1,9 @@
 import os
 
-from obi import cd_hit
-from obi.alignment_preparation import fasta_content
-from obi.cd_hit import replace_cluster_heads, CdHitReport
-from obi.utils import flat_map
+from obi.src import cd_hit
+from obi.src.alignment_preparation import fasta_content
+from obi.src.cd_hit import replace_cluster_heads, CdHitReport
+from obi.src.utils import flat_map
 from tests.utils import get_resource, results_path
 
 

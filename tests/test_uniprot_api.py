@@ -1,4 +1,4 @@
-from obi.uniprot_api import UniprotAPIClient
+from obi.src.uniprot_api import UniprotAPIClient
 
 
 class TestUniprotApiClient:

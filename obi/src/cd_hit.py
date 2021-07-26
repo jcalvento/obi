@@ -2,7 +2,7 @@ import copy
 import re
 import subprocess
 
-from obi.utils import detect
+from obi.src.utils import detect
 
 
 def process(fasta_file_path, output_file_path):

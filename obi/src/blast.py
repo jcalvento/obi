@@ -2,7 +2,7 @@ import os
 
 from Bio.Blast import NCBIXML
 
-from obi.logger import logger
+from obi.src.logger import logger
 
 
 class BlastResultsError(RuntimeError):

@@ -1,11 +1,11 @@
 import argparse
 import datetime
 
-from obi.blast import Blast, BlastResultsError
-from obi.entrez import InvalidEntrezIds
-from obi.obi_1 import Obi
-from obi.positive_selection import HyphyError, PositiveSelectionAnalyzer
-from obi.utils import create_results_dir, root_path
+from obi.src.blast import Blast, BlastResultsError
+from obi.src.entrez import InvalidEntrezIds
+from obi.src.obi_1 import Obi
+from obi.src.positive_selection import HyphyError, PositiveSelectionAnalyzer
+from obi.src.utils import create_results_dir, root_path
 
 if __name__ == "__main__":
     root_path = root_path()

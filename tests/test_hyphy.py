@@ -6,7 +6,7 @@ import pytest
 from pytest import fail
 from pytest_mock import mock
 
-from obi.hyphy import Hyphy, InvalidApiKeyError, HyphyAPIError, HyphyJobNotReady
+from obi.src.hyphy import Hyphy, InvalidApiKeyError, HyphyAPIError, HyphyJobNotReady
 from tests.utils import get_resource, results_dir, results_path
 
 
@@ -80,7 +80,7 @@ class TestHyphy:
             'url': 'datamonkey.org/MEME/6028aa9c328ea41e07fe788d'
         }
 
-    @mock.patch('obi.hyphy.RemoteHyphy._key_info')
+    @mock.patch('obi.src.hyphy.RemoteHyphy._key_info')
     def test_it_raises_an_error_when_api_key_is_expired(self, mock_key_info):
         mock_key_info.return_value = {
             "_id": "Your API Key",
