@@ -9,7 +9,7 @@
 - Download Swissprot and Uniprot-PDB mapping Databases. You can use fetch_db.py script to do so. `python src/scripts/fetch_db.py`
 
 ## Usage
-- Run main script with `python src/scripts/main.py`. You can check usage with `python src/scripts/main.py --help`
+- Run main script with `python obi/scripts/main.py`. You can check usage with `python src/scripts/main.py --help`
 ```commandline
 usage: main.py [-h] [--fasta FASTA] [--email EMAIL] [--output-path OUTPUT_PATH] [--blast BLAST] [--min-identity MIN_IDENTITY] [--max-evalue MAX_EVALUE] [--min-coverage MIN_COVERAGE] [--max-gaps MAX_GAPS] [--include-analysis]
                [--mode MODE]
@@ -31,7 +31,7 @@ optional arguments:
   --include-analysis    If present, runs positive selection analysis, which includes running Hyphy and getting final results. If not present, result includes until nucleotide alignment
   --mode MODE           Only used when --include-analysis is present. "local" if you want to run Hyphy locally, "remote" to use Datamonkey instead. Default: local
 ```
-- To run only analysis (if previous step didn't include it), `python src/scripts/analysis.py`.  You can check usage with `python src/scripts/analysis.py --help`
+- To run only analysis (if previous step didn't include it), `python obi/scripts/analysis.py`.  You can check usage with `python src/scripts/analysis.py --help`
 ```commandline
 usage: analysis.py [-h] [--input-path INPUT_PATH] [--mode MODE] [--api-key API_KEY] [--email EMAIL]
 
@@ -43,7 +43,7 @@ optional arguments:
   --api-key API_KEY     Required when running in remote mode. To get one go to http://datamonkey.org/apiKey
   --email EMAIL         Required when running in remote mode. You will get notified once job is done
 ```
-- To resume remote analysis `python src/scripts/resume_analysis.py`. You can check usage with `python src/scripts/resume_analysis.py --help`
+- To resume remote analysis `python obi/scripts/resume_analysis.py`. You can check usage with `python src/scripts/resume_analysis.py --help`
 ```commandline
 usage: resume_analysis.py [-h] [--input-path INPUT_PATH]
 
@@ -52,3 +52,12 @@ optional arguments:
   --input-path INPUT_PATH
                         Path of alignment preparation result
 ```
+
+## Conda Build
+- Run `conda build conda.recipe -c bioconda -c anaconda -c conda-forge -c defaults`
+- Convert build to different for distributions (OSx, Linux & Windows, remove current one): `conda convert path/to/obi/build/obi-x.x.x-x.tar.bz2 -p linux-64 -p win-64 -p osx-64 -p ...`
+- Upload: `anaconda upload /path/to/build.tar.bz2`
+
+## Conda Install
+Conda package can be found in https://anaconda.org/jcalvento/obi. To install, run:
+- `conda install -c jcalvento obi --channel bioconda`

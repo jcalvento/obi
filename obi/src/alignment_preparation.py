@@ -5,12 +5,12 @@ from shutil import copyfile
 
 from marshmallow import Schema, fields, post_load
 
-from src.obi import cd_hit
-from src.obi.cd_hit import replace_cluster_heads
-from src.obi.entrez import EntrezDB
-from src.obi.logger import info
-from src.obi.nucleotide_aligner import NucleotideAligner, NucleotideAlignmentResultSchema
-from src.obi.uniprot_api import UniprotAPIClient, UniprotIdMappingSchema
+from obi.src import cd_hit
+from obi.src.cd_hit import replace_cluster_heads
+from obi.src.entrez import EntrezDB
+from obi.src.logger import info
+from obi.src.nucleotide_aligner import NucleotideAligner, NucleotideAlignmentResultSchema
+from obi.src.uniprot_api import UniprotAPIClient, UniprotIdMappingSchema
 
 
 def parse_uniprot_ids(fasta_file):

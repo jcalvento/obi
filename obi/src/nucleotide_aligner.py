@@ -1,7 +1,7 @@
 from marshmallow import Schema, fields, post_load
 
-from src.obi.logger import logger
-from src.obi.utils import detect
+from obi.src.logger import logger
+from obi.src.utils import detect
 
 
 class NucleotideAlignmentResultSchema(Schema):

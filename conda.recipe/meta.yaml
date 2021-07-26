@@ -8,7 +8,7 @@ about:
   license: GPL-3.0
   summary: 'Positive selection analyser'
   description: |
-    This package receives a protein chain and scans it for positive selection events.
+    This package receives a protein chain and scans it for positive selection events. To install run conda install -c jcalvento obi --channel bioconda
   doc_source_url: https://github.com/jcalvento/obi/blob/master/README.md
 source:
   path: ..
