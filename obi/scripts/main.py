@@ -7,7 +7,9 @@ from obi.src.obi_1 import Obi
 from obi.src.positive_selection import HyphyError, PositiveSelectionAnalyzer
 from obi.src.utils import create_results_dir, root_path
 
-if __name__ == "__main__":
+
+def main():
+    global root_path
     root_path = root_path()
     parser = argparse.ArgumentParser()
     parser.add_argument('--fasta', help='Path of the Fasta file containing the problem sequence')
@@ -56,14 +58,12 @@ if __name__ == "__main__":
         "--api-key", help='Required when running in remote mode. To get one go to http://datamonkey.org/apiKey'
     )
     args = parser.parse_args()
-
     results_dir = args.output_path or create_results_dir(args.fasta)
     blast = Blast(args.blast)
     pdb_uniprot_mapping = f"{root_path}/pdb_chain_uniprot.csv"
     obi_1 = Obi(
         blast=blast, email=args.email, uniprot_pdb_csv_path=pdb_uniprot_mapping, results_dir=results_dir
     )
-
     print(f"Init time: {datetime.datetime.now()}")
     try:
         obi_1.run(
@@ -75,3 +75,7 @@ if __name__ == "__main__":
         print(e.message)
     print(f"Finish time: {datetime.datetime.now()}")
     print(f"Results: {results_dir}")
+
+
+if __name__ == "__main__":
+    main()

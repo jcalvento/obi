@@ -178,11 +178,14 @@ setup(
     #
     # For example, the following would provide a command called `sample` which
     # executes the function `main` from this package when invoked:
-    # entry_points={  # Optional
-    #     'console_scripts': [
-    #         'sample=sample:main',
-    #     ],
-    # },
+    entry_points={  # Optional
+        'console_scripts': [
+            'obi analysis = obi.scripts.analysis:analysis',
+            'obi fetch-db = obi.scripts.fetch_db:fetch_db',
+            'obi = obi.scripts.main:main',
+            'obi resume-analysis = obi.scripts.resume_analysis:resume_analysis',
+        ],
+    },
 
     # List additional URLs that are relevant to your project as a dict.
     #
