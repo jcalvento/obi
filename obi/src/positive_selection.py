@@ -2,7 +2,6 @@ import json
 from abc import abstractmethod
 from functools import reduce
 
-from obi.src.alignment_preparation import AlignmentPreparationResultSchema
 from obi.src.hyphy import Hyphy
 from obi.src.logger import info
 from obi.src.sifts import Sifts
@@ -101,6 +100,8 @@ class RemoteAnalyzer(PositiveSelectionAnalyzer):
             f.write(json.dumps(hyphy_result, indent=2))
         print(f"Job queued in Datamonkey: {hyphy_result}")
 
+        return hyphy_result
+
     def resume(self, results_dir, alignment_preparation_result):
         with open(f"{results_dir}/datamonkey_response.json", "r") as f:
             job_data = json.load(f)
@@ -121,40 +122,50 @@ class PositiveSelectionReport:
         positive_selection_rows = self._select_positive_rows()
         result = {}
         for uniprot_id, alignment in self._alignment_preparation_result.nucleotide_alignment.items():
-            uniprot_id_prefix = uniprot_id.split('.')[0]
-            if uniprot_id_prefix not in self._pdb_mappings.keys():
+            id_prefix = uniprot_id.split('.')[0]
+            if id_prefix not in self._pdb_mappings.keys():
                 continue
-            acc_number = detect(
-                lambda mapping: uniprot_id.startswith(mapping.from_id),
-                self._alignment_preparation_result.uniprot_entrez_mapping
-            ).to_id.split('.')[0]
+            acc_number = self._accession_number(uniprot_id)
             rows = []
             codons = self._alignment_preparation_result.codons_and_translations[uniprot_id]['codons']
             alignment_codons = [alignment[index:index + 3] for index in range(0, len(alignment), 3)]
             translation = self._alignment_preparation_result.codons_and_translations[uniprot_id]['translation']
             amino_acid_alignment = self._alignment_preparation_result.amino_acid_alignment[uniprot_id]
             for selection_row in positive_selection_rows:
-                index = selection_row['index']
-                row = {
-                    'acc_number': acc_number,
-                    'index': index,
-                    'p-value': selection_row['p-value'],
-                    'codon': get_element(codons, index),
-                    'aa': get_element(translation, index),
-                    'al_codon': alignment_codons[index],
-                    'al_aa': amino_acid_alignment[index],
-                    'pdbs': []
-                }
-                for pdb_info in self._pdb_mappings[uniprot_id_prefix]:
-                    residue = pdb_info[0]
-                    pdb_id = list(residue.keys())[0]
-                    chains = {}
-                    for chain, mapping in residue[pdb_id].items():
-                        chains[chain] = mapping.get(index + 1)
-                    row['pdbs'].append({'id': pdb_id, 'chains': chains})
+                row = self.map_data_to_row(
+                    acc_number, alignment_codons, amino_acid_alignment, codons, selection_row, translation, id_prefix
+                )
                 rows.append(row)
             result[uniprot_id] = rows
         return result
+
+    def map_data_to_row(self, acc_number, alignment_codons, amino_acid_alignment, codons, selection_row, translation,
+                        id_prefix):
+        index = selection_row['index']
+        row = {
+            'acc_number': acc_number,
+            'index': index,
+            'p-value': selection_row['p-value'],
+            'codon': get_element(codons, index),
+            'aa': get_element(translation, index),
+            'al_codon': alignment_codons[index],
+            'al_aa': amino_acid_alignment[index],
+            'pdbs': []
+        }
+        for pdb_info in self._pdb_mappings[id_prefix]:
+            residue = pdb_info[0]
+            pdb_id = list(residue.keys())[0]
+            chains = {}
+            for chain, mapping in residue[pdb_id].items():
+                chains[chain] = mapping.get(index + 1)
+            row['pdbs'].append({'id': pdb_id, 'chains': chains})
+        return row
+
+    def _accession_number(self, uniprot_id):
+        return detect(
+            lambda mapping: uniprot_id.startswith(mapping.from_id),
+            self._alignment_preparation_result.uniprot_entrez_mapping
+        ).to_id.split('.')[0]
 
     def _select_positive_rows(self):
         positive_selection_rows = []

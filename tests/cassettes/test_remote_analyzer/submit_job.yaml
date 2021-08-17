@@ -1,0 +1,263 @@
+interactions:
+- request:
+    body: api_key=your-api-key
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '32'
+      Content-Type:
+      - application/x-www-form-urlencoded
+      User-Agent:
+      - python-requests/2.23.0
+    method: POST
+    uri: http://datamonkey.org/api/v1/keyinfo
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA3WPMU/DMBCF/8vNaXq+S3qO947dOhUhy46PykASSAICIf47zoBEB9ZP77737gt8
+        TuDggITCh0Siraph28eIkXuowPt3cFRBWJapz2HV5B+nWM4WcHeQwhqGaXzSz3qar/vT8XTcbzKL
+        Gm9lUYrsn7gNXYpMVkNjFOVBxVqG+wq2plmHkMc8XsF1nfllr2+6rH4ISQu+hc95yCs4g4gV6MdL
+        nrVsBUIyO6QdtWcU17SOuLZNdymz+lm3x/6EUM7EReFYamG8wPcPJPnWqisBAAA=
+    headers:
+      Access-Control-Allow-Headers:
+      - DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Range
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sun, 14 Feb 2021 04:38:16 GMT
+      ETag:
+      - W/"12b-IQLjEtEHx2cRBTxs6sMmpQmnpHY"
+      Server:
+      - nginx/1.10.1
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Powered-By:
+      - Express
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '>O65493.1
+
+      atggctttttctgcacca------tcactttccaaattctctcttttggttgccatttcagcatcagctctcctctgttgtgcttttgcccgtgatttctccattgttggatacacgccggagcatttgacaaacactgacaagcttctagagctcttcgagtcatggatgtcagaacacagcaaggcttac---aaaagcgtggaggagaaggtgcacaggtttgaggttttcagagagaatctgatgcatatagaccagaggaacaatgag------------atcaacagttactggctcggtttgaacgagtttgcggatttgacccatgaagagttcaaaggaagatatctaggacttgcaaagccacaattctctagaaagaga---------cagccctcagctaac------ttcaggtacagagatatcacggacttgcctaaatccgtagactggagaaagaaaggcgctgtggctcctgtcaaggaccagggtcaatgtggtagctgttgggcattttcaacagttgcagctgtcgaggggatcaaccagatcacaacagggaatctgagttcgctttcagagcaagaactcatagactgtgacacaact---ttcaacagtggctgcaatggaggtctcatggactacgcattccagtacataatttcgaccggtggtctccacaaagaagatgattacccttatctcatggaggaagga---atttgtcaagagcagaaa---------gaggatgtggaacgtgtgacaatcagcggctacgaagatgtccctgaaaatgatgacgaaagcctggtgaaggctttagctcatcagccagtcagtgtggctattgaggcttcaggaagagacttccagttctacaaagggggagtgtttaatggtaaatgtggaacagacctagaccacggtgtggcagcggttggatatggttcatca---aagggatctgactatgttattgtcaagaactcatggggaccaagatggggagagaaagggtttattaggatgaagagaaacactggtaaaccagagggactctgtggaatcaacaagatggcctcatatcctaccaagaccaag------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+      >Q9LM66.2
+
+      atggctctttcttcacct------tcaagaatcctctgttttgctcttgccttatccgctgcttctctctccctctctttcgcttcttcccacgattactccatcgttggatactcccccgaggatttggaatctcatgacaaactcatagaactcttcgaaaactggatctcaaattttgagaaagcttat---gaaaccgttgaagagaagtttcttaggttcgaagttttcaaggataatctaaagcacatcgatgagactaacaagaaa------------gggaaaagctactggctcgggctcaacgagtttgcggatttgagccatgaggagttcaagaaaatgtatttagggctcaagactgatatagtgagacgcgatgaa------gaaagatcttacgcagag------ttcgcttacagggacgtcgaagctgttcctaagtctgttgactggagaaagaaaggagctgtggcggaagttaagaaccagggctcttgtggaagttgttgggcgttttcgacagtagcagctgtcgaaggtataaacaagattgtgacaggaaacttgacaacattgtcagaacaagaactcatagactgtgacacgacc---tacaacaatggctgcaacggtggtctcatggactatgcctttgagtacattgttaagaacggaggtctacgcaaggaagaagattatccttactctatggaagaagga---acttgcgagatgcaaaag---------gatgaatctgaaacagtaaccattaatggacaccaagacgtacctactaatgatgagaagagtctcttgaaggcattggctcatcagcctctcagtgtcgccattgatgcatctggtagagagttccagttctatagcggcggcgtgtttgatgggcggtgcggggttgatcttgaccacggtgtggctgcggttgggtatggatcaagc---aagggttcagattacatcattgtgaagaattcttggggaccaaaatggggagaaaaaggttacatcaggctgaagaggaacactgggaaaccagagggtctctgtggaatcaacaagatggcttctttccccaccaaaactaag------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+      >Q9FGR9.1
+
+      ------------atg------------------aagcgatttattgtt------------ctt---gcgctttgcatgcttatggttcttgaaaccacaaagggtttagatttccataacaaagatgtggaatcagagaatagcttgtgggagctatacgaacggtggaggagtcaccacactgttgct------aggagccttgaagagaaagctaagaggttcaacgtgttcaagcacaacgtgaagcacatccatgagaccaacaagaag------------gataaatcttacaagctcaagctaaacaagtttggtgacatgactagtgaagaatttaggagaacatacgctggttcaaacatcaaacatcataggatgtttcaaggcgaaaaaaaggccacaaagagcttcatgtatgcaaat------gtaaatactctcccaacctccgttgattggagaaagaatggagccgtcactcctgtcaaaaaccaaggccaatgcgggagttgttgggcgttttcaacagttgttgcggtggaagggatcaaccaaataagaactaaaaagctgacatcactctcagagcaagagctagtagattgtgatacaaac---cagaaccaaggatgcaatggaggtctaatggaccttgcttttgagttcatcaaggagaaaggaggactcacaagtgagctagtgtacccttacaaggcttctgatgaa---acttgtgacacaaacaaa---------gaaaatgctccggtagtttcaatcgatggacacgaagatgttcctaagaacagcgaggatgatctaatgaaagctgttgctaatcagcctgtttctgttgctattgatgctggaggctcagactttcaattctactccgagggagtgtttaccgggagatgcggaacagagctaaaccatggagttgcggtagtagggtatggaacaacgatagacggaacaaagtattggattgttaagaattcatggggagaggaatggggagagaaaggatacataagaatgcagagagggattcgtcataaagaaggactttgtggtattgcaatggaagcttcttatcctctcaagaactccaacact---aac---ccttctagactttccttggactcgcttaaggatgaactc------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+      >Q9STL4.1
+
+      ------------atg------------------aagaaacttcttttg------------ata---tttctcttttctcttgtcattctccaaactgcttgtggattcgattacgacgacaaggaaatagaaagcgaagagggcttatcaacgctttatgatagatggaggagccaccactccgttcct------aggagtctaaatgaaagggagaagagattcaacgttttcagacacaatgtcatgcatgtccacaataccaacaagaag------------aaccgatcctacaaacttaagctcaacaagtttgcagatttaacaattaatgagttcaagaatgcatacaccggttccaacatcaagcatcacagaatgttgcaaggaccaaaacgcggctcaaaacagttcatgtatgatcatgagaatttatccaaattaccgtcctccgttgattggagaaagaaaggtgctgtcactgaaatcaagaatcaaggaaaatgtggaagttgttgggcattctctaccgtagcagctgttgagggaatcaacaagatcaagactaacaaactggtctcactgtctgaacaagaactagtggattgtgatactaag---cagaatgaaggttgtaacggaggtcttatggagattgcatttgaattcatcaagaagaacggtggtatcaccactgaagatagctatccttatgaaggtatcgatgga---aaatgcgacgcttcaaag---------gataacggcgtgcttgtgacgatagatgggcatgaagatgtacccgaaaacgacgaaaatgctcttcttaaggctgttgcaaaccaacctgtatctgttgcaattgatgctggaagttcagatttccagttttattcagagggagtgtttacgggatcttgtggaacagagctgaaccatggtgtggcagcggtcgggtatggatctgag---agggggaaaaagtattggatagtgagaaactcatggggagctgaatggggagagggaggctatataaagattgaaagagagattgatgaaccggaagggcgttgcggtattgcgatggaggcatcgtatccgatcaagctatcgtcgtct---aat---cctaccccgaaagacggtgat---gtcaaagatgagctc------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+      >Q9FJ47.1
+
+      atggctttaaaa------------catatgcaaatctttctcttcgtcgct---------atattttcatcattctgt------------------ttctccatcactctt------tctcgtccactcgacaatgaactcatcatgcaaaagaggcacatcgagtggatgactaaacacggccgtgtctac---gcggatgtgaaggaggaaaacaatcgctacgttgtgttcaaaaacaacgtcgaacgcattgaacatttaaatagcattcct------gccggaagaactttcaaacttgcggtaaatcagtttgctgatttaaccaatgacgaatttcgttccatgtacactggtttcaaaggtgtctcggcattatctagccaaagccaa---actaaaatgtcgccgtttaggtaccaaaacgtttcttctggtgctttgccggtttctgttgactggaggaagaaaggagctgtgacccctatcaagaatcaaggcagctgcggatgttgttgggcgttttcagcggttgcggctattgaaggagcaacacaaataaagaaagggaaacttatatctttgtcagaacaacagcttgttgattgcgacacaaac------gattttggctgcgaaggcggtttaatggatactgcgtttgagcatataaaagcgactggcggcttgacaactgagtcaaattatccttacaaaggcgaagacgct---acttgcaattccaaaaag---------accaatccaaaagcaacttctattacaggttatgaggatgtcccggttaatgatgagcaagcactgatgaaggcagtggcacaccaaccggttagcgttggaattgaaggaggtggttttgatttccaattctattcgtctggtgtgttcactggagagtgcactacgtatcttgatcatgcagtaactgcgattggatacggcgaatctactaacggatcaaagtattggatcatcaagaattcatggggaacaaaatggggagaaagtggatatatgaggattcaaaaagatgtcaaggataaacaaggactatgtggtcttgccatgaaagcttcttacccaactata------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+      >Q9LT78.1
+
+      atggctacttcaatcaaa------tctataaccctagctctcttgata---ttctcagtgttactaatctccttgtct---------ctcggc---tccgtcacagcgacg---------gagactacacgaaacgaggcggaggcacgacggatgtatgaaaggtggcttgttgagaatcggaagaactat---aatggtctcggagagaaagagagacgctttgagatcttcaaagacaacttgaagttcgtcgaagagcacagttccatcccg---------aatcggacttacgaagtcgggttgacccggttcgctgatttgactaacgatgagtttcgtgcgatttacttgaggagcaagatggagagaactagggtt------------ccggtgaagggagagaag------tatttgtataaggttggagatagcttacctgatgctatcgattggagagctaaaggtgctgttaatccagtcaaagatcaaggatcctgtggaagttgttgggcgttttccgcgattggagcggttgaaggtataaatcagattaagacaggagagttgatatctttgtctgagcaagaacttgttgattgtgacacaagt---tacaatgatggatgtggtggaggtcttatggattatgcttttaagttcattattgaaaacggtggtattgatacagaggaagattatccttatattgcaactgatgttaacgtgtgcaattctgataag---------aagaacactcgtgttgttaccatcgatggttatgaggatgttcctcaaaacgatgagaagtctttgaagaaggctcttgctaatcaacctattagtgttgccattgaagctggtggcagagctttccagctttacacatctggtgtgtttacaggaacatgtggaacatctttggaccatggtgttgtagctgtgggatacggatcagaa---ggtggtcaagactactggattgttcgtaactcatggggatcaaactggggagaaagcggatactttaagctcgaacgtaacatcaaagagtcatcagggaaatgcggtgtggcgatgatggcttcttaccctaccaaatcatcaggctcaaaccca---------------ccaaaaccgccagcgccttcaccggttgtttgtgacaagtctaacacttgtccagctaagtccacttgttgttgcctatatgagtacaatggtaaatgctatagctggggatgttgtccgtatgagtcagccacttgttgcgatgatggttctagctgctgcccccagtcataccctgtctgcgatttaaaggccaatacttgtagaatgaagggaaacagtccgttaagcataaaagctttgacacgaggaccagcgattgcgaccacaaagtctacaaacatgctagtgggcagcgct---------------
+
+      >F4JNL3.1
+
+      atgggctttgttagacct------gtttgcatgacaatcctctttctt---ttgattgtattcgttctttcggcgccgtcctcggccatggaccttcccgccacatccggt---------ggtcacaaccggagcaacgaggaggttgagtttattttccaaatgtggatgtccaagcacgggaagacttataccaatgctctcggagagaaggaacggcgttttcagaacttcaaggacaatctccgtttcatcgaccagcacaatgcaaag------------aacctctcttaccagcttggtttgactcggtttgcagacctaaccgttcaagagtaccgagaccttttccctggaagccctaaaccgaaacaaaggaat------------ctcaaaaccagtcgtagg------tacgtgccactcgccggagatcagctcccagagtcagttgactggaggcaagaaggtgcagtgtcggaaattaaagaccaaggcacttgcaacagctgctgggcgttctccacagtggcagcagtagagggattaaacaagattgtgacaggagagttaatctcattgtccgagcaagaattggtcgactgcaacctagtc---aacaacggttgttatggatcaggactaatggacacagctttccagttccttatcaataacaatggtcttgattccgaaaaagattatccataccagggcactcaaggctcctgtaaccgcaaacagtct---------acctcaaacaaggtcatcacgattgatagctacgaggatgtgccagcgaatgatgagatttccttacaaaaggcggttgctcaccagcccgtgagtgttggcgttgacaaaaaatcccaagaatttatgctctatcgatcgtgtatatataatggaccatgcggaacaaatcttgaccatgcacttgttatcgtcgggtacggtagtgag---aacggtcaggactattggatcgtgagaaactcatggggaacgacttggggagatgctggctacattaagattgctcgtaactttgaagatccaaaaggtctctgtggaattgcgatgcttgcttcatatcctattaagaattcggcttccaatgca------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '10303'
+      Content-Type:
+      - application/octet-stream
+      User-Agent:
+      - python-requests/2.23.0
+      filename:
+      - nucleotide_alignment.fasta
+    method: POST
+    uri: https://filebin.net/
+  response:
+    body:
+      string: "{\n    \"filename\": \"nucleotide_alignment.fasta\",\n    \"bin\":
+        \"fjgnyyo6t69yeypb\",\n    \"bytes\": 10303,\n    \"mime\": \"text/plain;
+        charset=utf-8\",\n    \"created\": \"2021-02-14T04:44:09.804730432Z\",\n    \"links\":
+        [\n        {\n            \"rel\": \"file\",\n            \"href\": \"https://filebin.net/fjgnyyo6t69yeypb/nucleotide_alignment.fasta\"\n
+        \       },\n        {\n            \"rel\": \"bin\",\n            \"href\":
+        \"https://filebin.net/fjgnyyo6t69yeypb\"\n        }\n    ],\n    \"datetime\":
+        \"0001-01-01T00:00:00Z\"\n}"
+    headers:
+      Age:
+      - '0'
+      Bin:
+      - fjgnyyo6t69yeypb
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '490'
+      Content-Type:
+      - application/json
+      Date:
+      - Sun, 14 Feb 2021 04:44:09 GMT
+      Filename:
+      - nucleotide_alignment.fasta
+      Via:
+      - 1.1 varnish (Varnish/6.0)
+      X-Varnish:
+      - '6395198'
+    status:
+      code: 201
+      message: Created
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.23.0
+    method: GET
+    uri: https://filebin.net/fjgnyyo6t69yeypb/nucleotide_alignment.fasta
+  response:
+    body:
+      string: "<!DOCTYPE html>\n<html lang=\"en\">\n    <head>\n        <meta charset=\"utf-8\">\n
+        \       <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\n        <meta
+        name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n        \n\n
+        \       <meta name=\"description\" content=\"Upload files and make them available
+        for your friends. Think of it as Pastebin for files. Registration is not required.
+        Large files are supported.\">\n        <meta name=\"author\" content=\"Espen
+        Braastad\">\n        <link rel=\"icon\" href=\"https://filebin.net/static/img/favicon.png\">\n\n
+        \       <title>Filebin</title>\n\n        \n        <link rel=\"stylesheet\"
+        href=\"https://filebin.net/static/bootstrap/css/bootstrap.min.css\"/>\n        <link
+        rel=\"stylesheet\" href=\"https://filebin.net/static/css/upload.css\"/>\n
+        \       <link rel=\"stylesheet\" href=\"https://filebin.net/static/css/custom.css\"/>\n
+        \       <link rel=\"stylesheet\" href=\"https://filebin.net/static/css/font-awesome.css\"/>\n
+        \   </head>\n\n    <body>\n        <div class=\"container h-100\">\n            <div
+        class=\"row h-100 align-items-center\">\n                <div class=\"col-12\">\n
+        \                   <div class=\"card mx-auto\" style=\"max-width: 30rem;\">\n
+        \                       <h5 class=\"card-header text-center\">\n                            File
+        download\n                        </h5>\n                        <div class=\"card-body\">\n
+        \                           <div class=\"row\">\n                                <div
+        class=\"col\">\n                                    <p class=\"card-text\">\n
+        \                                       <small class=\"text-muted\">\n                                            <dl
+        class=\"row\">\n                                                <dt class=\"col\">File
+        name</dt>\n                                                <dd class=\"col\">nucleotide_alignment.fasta</dd>\n
+        \                                               <dt class=\"col\">File size</dt>\n
+        \                                               <dd class=\"col\">10 kB</dd>\n
+        \                                               <dt class=\"col\">Content
+        type</dt>\n                                                <dd class=\"col\">text/plain;
+        charset=utf-8</dd>\n                                                <dt class=\"col\">Uploaded</dt>\n
+        \                                               <dd class=\"col\">1 second
+        ago</dd>\n                                            </dl>\n                                        </small>\n
+        \                                   </p>\n                                </div></div>\n
+        \                       </div>\n\n                        <div class=\"card-footer\">\n
+        \                           <p class=\"card-text\">\n                                <div
+        class=\"text-center\"><a href=\"https://filebin.net/fjgnyyo6t69yeypb/nucleotide_alignment.fasta?t=j8qaihvk\"
+        class=\"btn btn-primary\">\n                                                <i
+        class=\"fa fa-cloud-download\"></i>\n                                                Download\n
+        \                                           </a><a href=\"https://filebin.net/fjgnyyo6t69yeypb\"
+        class=\"btn btn-light\">\n                                                <i
+        class=\"fa fa-list-ul\"></i>\n                                                File
+        listing\n                                            </a></div>\n                            </p>\n
+        \                       </div>\n                    </div>\n                </div>\n
+        \           </div>\n        </div>\n    </body>\n</html>\n"
+    headers:
+      Bin:
+      - fjgnyyo6t69yeypb
+      Cache-Control:
+      - s-maxage=1
+      Connection:
+      - close
+      Content-Type:
+      - text/html; charset=utf-8
+      Date:
+      - Sun, 14 Feb 2021 04:44:11 GMT
+      Filename:
+      - nucleotide_alignment.fasta
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Content-Type
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"api_key": "your-api-key", "method": "MEME", "fastaLoc": "https://filebin.net/fjgnyyo6t69yeypb/nucleotide_alignment.fasta?t=j8qaihvk",
+      "mail": "juliancalvento@gmail.com", "gencodeid": "Universal", "fileExtension":
+      "fasta"}'
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '235'
+      Content-Type:
+      - application/json
+      User-Agent:
+      - python-requests/2.23.0
+    method: POST
+    uri: http://datamonkey.org/api/v1/submit
+  response:
+    body:
+      string: !!binary |
+        H4sIAAAAAAAAA3WMMQ7CMAxF7+KZtraxSMjesRsTC7KIQRWUQpsMCHF3fAHG/9/T+0AZJzutRacn
+        JGBkapAbkgNKEknELVE4wgbG7HyHHFX35y1HUyHDcLEQY3buiVJXd17VqvlRl7uvrJ6eHzd7t/Ny
+        7YZ+6Lu/le8PBF0BYo8AAAA=
+    headers:
+      Access-Control-Allow-Headers:
+      - DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range
+      Access-Control-Allow-Methods:
+      - GET, POST, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Access-Control-Expose-Headers:
+      - Content-Length,Content-Range
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Sun, 14 Feb 2021 04:38:20 GMT
+      ETag:
+      - W/"8f-DVj29UE9gE8IfKsglMsHq0AAB60"
+      Server:
+      - nginx/1.10.1
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      X-Powered-By:
+      - Express
+    status:
+      code: 200
+      message: OK
+version: 1
