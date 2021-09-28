@@ -1,5 +1,8 @@
-# Obi 1
+<p align="center">
+  <img src="img/logo.png" alt="Logo">
+</p>
 
+# Obi
 ![Status](https://github.com/jcalvento/tesina/workflows/Obi%201/badge.svg)
 [![Anaconda-Server Badge](https://anaconda.org/jcalvento/obi/badges/installer/conda.svg)](https://conda.anaconda.org/jcalvento)
 [![Anaconda-Server Badge](https://anaconda.org/jcalvento/obi/badges/latest_release_date.svg)](https://conda.anaconda.org/jcalvento)
@@ -7,10 +10,14 @@
 ## Setup
 - Install [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html) (if you want a lightweight version)
 - Create conda env with Python 3.7.* using requirements from environment.yml file. i.e. `conda env create --file environment.yml python=3.7`
-- Download Swissprot and Uniprot-PDB mapping Databases. You can use fetch_db.py script to do so. `python src/scripts/fetch_db.py`
+- Download [Swissprot DB](https://ftp.ncbi.nlm.nih.gov/blast/db/swissprot.tar.gz) and [Uniprot <-> PDB mappings](http://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/csv/pdb_chain_uniprot.csv.gz) from NCBI FTP server. You can use fetch_db.py script to do so (`python src/scripts/fetch_db.py`) or simply run `obi fetch-db` if you installed it as a Conda package. 
 
 ## Usage
-- Run main script with `python obi/scripts/main.py`. You can check usage with `python src/scripts/main.py --help`
+For each script you can get arguments description and usage by using `--help` argument. i.e. `obi --help`
+
+### Analysis entrypoint
+To run the whole analysis or first part depending on the arguments, you can either use `python obi/scripts/main.py` or `obi` if you installed it program as a Conda package.
+
 ```commandline
 usage: main.py [-h] [--fasta FASTA] [--email EMAIL] [--output-path OUTPUT_PATH] [--blast BLAST] [--min-identity MIN_IDENTITY] [--max-evalue MAX_EVALUE] [--min-coverage MIN_COVERAGE] [--max-gaps MAX_GAPS] [--include-analysis]
                [--mode MODE]
@@ -32,7 +39,9 @@ optional arguments:
   --include-analysis    If present, runs positive selection analysis, which includes running Hyphy and getting final results. If not present, result includes until nucleotide alignment
   --mode MODE           Only used when --include-analysis is present. "local" if you want to run Hyphy locally, "remote" to use Datamonkey instead. Default: local
 ```
-- To run only analysis (if previous step didn't include it), `python obi/scripts/analysis.py`.  You can check usage with `python src/scripts/analysis.py --help`
+### Only analysis
+To run only the analysis (if previous step didn't include it), `python obi/scripts/analysis.py` or `obi analysis` (if installed as Conda package).
+
 ```commandline
 usage: analysis.py [-h] [--input-path INPUT_PATH] [--mode MODE] [--api-key API_KEY] [--email EMAIL]
 
@@ -44,7 +53,9 @@ optional arguments:
   --api-key API_KEY     Required when running in remote mode. To get one go to http://datamonkey.org/apiKey
   --email EMAIL         Required when running in remote mode. You will get notified once job is done
 ```
-- To resume remote analysis `python obi/scripts/resume_analysis.py`. You can check usage with `python src/scripts/resume_analysis.py --help`
+### Resume remote analysis
+Run `python obi/scripts/resume_analysis.py` or `obi resume-analysis` (if installed as Conda package).
+
 ```commandline
 usage: resume_analysis.py [-h] [--input-path INPUT_PATH]
 
