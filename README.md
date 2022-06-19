@@ -59,7 +59,7 @@ optional arguments:
 For development env use `python obi/scripts/run.py`  
 
 ### Only analysis
-To run only the analysis (if previous step didn't include it) use `obi analysis`
+To run only the analysis (if previous step didn't include it) use `obi\ analysis`
 
 ```commandline
 usage: obi analysis [-h] [--input-path INPUT_PATH] [--mode MODE] [--api-key API_KEY] [--email EMAIL]
@@ -76,10 +76,10 @@ optional arguments:
 For development env use  `python obi/scripts/analysis.py`
 
 ### Resume remote analysis
-Run `obi resume-analysis`
+Run `obi\ resume-analysis`
 
 ```commandline
-usage: resume_analysis.py [-h] [--input-path INPUT_PATH]
+usage: resume [-h] [--input-path INPUT_PATH]
 
 optional arguments:
   -h, --help            show this help message and exit
