@@ -7,20 +7,33 @@
 [![Anaconda-Server Badge](https://anaconda.org/jcalvento/obi/badges/installer/conda.svg)](https://conda.anaconda.org/jcalvento)
 [![Anaconda-Server Badge](https://anaconda.org/jcalvento/obi/badges/latest_release_date.svg)](https://conda.anaconda.org/jcalvento)
 
+## Conda Install
+Conda package can be found in https://anaconda.org/jcalvento/obi. To install, run:
+- `conda install -c jcalvento obi --channel bioconda`
+
+## Usage
+For each script you can get arguments description and usage by using `--help` argument. i.e. `obi --help`
+
+```commandline
+There are the available commands, each one has its own parameters. Use obi <command> --help to learn more about the usage
+
+obi fetch-db                  Downloads Swissprot DB and Uniprot <-> PDB mappings from NCBI FTP server
+obi run [<args>]              Runs the whole analysis or first part depending on the arguments
+obi analysis [<args>]         Runs positive selection analysis, which includes running Hyphy and getting final results
+obi resume-analysis [<args>]  Runs the whole analysis or first part depending on the arguments
+```
+
 ## Setup
 - Install [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html) (if you want a lightweight version)
 - Create conda env with Python 3.7.* using requirements from environment.yml file. i.e. `conda env create --file environment.yml python=3.7`
 - Download [Swissprot DB](https://ftp.ncbi.nlm.nih.gov/blast/db/swissprot.tar.gz) and [Uniprot <-> PDB mappings](http://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/csv/pdb_chain_uniprot.csv.gz) from NCBI FTP server. You can use fetch_db.py script to do so (`python src/scripts/fetch_db.py`) or simply run `obi fetch-db` if you installed it as a Conda package. 
 
-## Usage
-For each script you can get arguments description and usage by using `--help` argument. i.e. `obi --help`
-
 ### Analysis entrypoint
-To run the whole analysis or first part depending on the arguments, you can either use `python obi/scripts/run.py` or `obi run` if you installed it program as a Conda package.
+To run the whole analysis or first part depending on the arguments, you can use `obi\ run --help`
 
 ```commandline
-usage: run.py [-h] [--fasta FASTA] [--email EMAIL] [--output-path OUTPUT_PATH] [--blast BLAST] [--min-identity MIN_IDENTITY] [--max-evalue MAX_EVALUE] [--min-coverage MIN_COVERAGE] [--max-gaps MAX_GAPS] [--include-analysis]
-               [--mode MODE]
+usage: obi run [-h] [--fasta FASTA] [--email EMAIL] [--output-path OUTPUT_PATH] [--blast BLAST] [--min-identity MIN_IDENTITY] [--max-evalue MAX_EVALUE] [--min-coverage MIN_COVERAGE]
+               [--max-gaps MAX_GAPS] [--include-analysis] [--mode MODE] [--api-key API_KEY]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -38,12 +51,16 @@ optional arguments:
   --max-gaps MAX_GAPS   Maximum number of gaps permitted for Blast results. Default: 6
   --include-analysis    If present, runs positive selection analysis, which includes running Hyphy and getting final results. If not present, result includes until nucleotide alignment
   --mode MODE           Only used when --include-analysis is present. "local" if you want to run Hyphy locally, "remote" to use Datamonkey instead. Default: local
+  --api-key API_KEY     Required when running in remote mode. To get one go to http://datamonkey.org/apiKey
 ```
+
+For development env use `python obi/scripts/run.py`  
+
 ### Only analysis
-To run only the analysis (if previous step didn't include it), `python obi/scripts/analysis.py` or `obi analysis` (if installed as Conda package).
+To run only the analysis (if previous step didn't include it) use `obi analysis`
 
 ```commandline
-usage: analysis.py [-h] [--input-path INPUT_PATH] [--mode MODE] [--api-key API_KEY] [--email EMAIL]
+usage: obi analysis [-h] [--input-path INPUT_PATH] [--mode MODE] [--api-key API_KEY] [--email EMAIL]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -53,8 +70,11 @@ optional arguments:
   --api-key API_KEY     Required when running in remote mode. To get one go to http://datamonkey.org/apiKey
   --email EMAIL         Required when running in remote mode. You will get notified once job is done
 ```
+
+For development env use  `python obi/scripts/analysis.py`
+
 ### Resume remote analysis
-Run `python obi/scripts/resume_analysis.py` or `obi resume-analysis` (if installed as Conda package).
+Run `obi resume-analysis`
 
 ```commandline
 usage: resume_analysis.py [-h] [--input-path INPUT_PATH]
@@ -64,12 +84,19 @@ optional arguments:
   --input-path INPUT_PATH
                         Path of alignment preparation result
 ```
+For development env use `python obi/scripts/resume_analysis.py`
+
+
+### Running an example
+
+An input file example can be found in the `examples` directory. The input fasta file, containing the Human Hemoglobing, can be analyzed by running:
+
+```commandline
+
+```
+
 
 ## Conda Build
 - Run `conda build conda.recipe -c bioconda -c anaconda -c conda-forge -c defaults`
 - Convert build to different for distributions (OSx, Linux & Windows, remove current one): `conda convert path/to/obi/build/obi-x.x.x-x.tar.bz2 -p linux-64 -p win-64 -p osx-64 -p ...`
 - Upload: `anaconda upload /path/to/build.tar.bz2`
-
-## Conda Install
-Conda package can be found in https://anaconda.org/jcalvento/obi. To install, run:
-- `conda install -c jcalvento obi --channel bioconda`
