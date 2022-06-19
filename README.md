@@ -25,8 +25,10 @@ obi resume-analysis [<args>]  Runs the whole analysis or first part depending on
 
 ## Setup
 - Install [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html) (if you want a lightweight version)
+
 - Create conda env with Python 3.7.* using requirements from environment.yml file. i.e. `conda env create --file environment.yml python=3.7`
-- Download [Swissprot DB](https://ftp.ncbi.nlm.nih.gov/blast/db/swissprot.tar.gz) and [Uniprot <-> PDB mappings](http://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/csv/pdb_chain_uniprot.csv.gz) from NCBI FTP server. You can use fetch_db.py script to do so (`python src/scripts/fetch_db.py`) or simply run `obi fetch-db` if you installed it as a Conda package. 
+
+- Download [Swissprot DB](https://ftp.ncbi.nlm.nih.gov/blast/db/swissprot.tar.gz) and [Uniprot <-> PDB mappings](http://ftp.ebi.ac.uk/pub/databases/msd/sifts/flatfiles/csv/pdb_chain_uniprot.csv.gz) from NCBI FTP server. You simply run `obi\ fetch-db` if you installed it as a Conda package, or use the fetch_db.py script (`python src/scripts/fetch_db`) when you are in the development env
 
 ### Analysis entrypoint
 To run the whole analysis or first part depending on the arguments, you can use `obi\ run --help`
@@ -92,11 +94,23 @@ For development env use `python obi/scripts/resume_analysis.py`
 An input file example can be found in the `examples` directory. The input fasta file, containing the Human Hemoglobing, can be analyzed by running:
 
 ```commandline
-
+obi\ run --fasta /home/ana/user/examples/P68871_HBB/hb_homo_sapiens.fasta --mode remote --api-key userAPIKEY --email user@gmail.com
 ```
 
+Check the setup section before running your analysis
 
 ## Conda Build
 - Run `conda build conda.recipe -c bioconda -c anaconda -c conda-forge -c defaults`
 - Convert build to different for distributions (OSx, Linux & Windows, remove current one): `conda convert path/to/obi/build/obi-x.x.x-x.tar.bz2 -p linux-64 -p win-64 -p osx-64 -p ...`
 - Upload: `anaconda upload /path/to/build.tar.bz2`
+
+
+## Colaborate with Obi project
+
+The OBI project is open to contributions. Please contact the project manager Dr. Ana Julia Velez Rueda.
+
+National University of Quilmes, Roque Saenz Peña 352, B1876BXD, Bernal, Buenos Aires, Argentina
+
+Phone: + 54 11 43657100 ext 5657
+
+E-mail: avelezrueda@uvq.edu.ar
