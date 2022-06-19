@@ -16,10 +16,10 @@
 For each script you can get arguments description and usage by using `--help` argument. i.e. `obi --help`
 
 ### Analysis entrypoint
-To run the whole analysis or first part depending on the arguments, you can either use `python obi/scripts/main.py` or `obi` if you installed it program as a Conda package.
+To run the whole analysis or first part depending on the arguments, you can either use `python obi/scripts/run.py` or `obi run` if you installed it program as a Conda package.
 
 ```commandline
-usage: main.py [-h] [--fasta FASTA] [--email EMAIL] [--output-path OUTPUT_PATH] [--blast BLAST] [--min-identity MIN_IDENTITY] [--max-evalue MAX_EVALUE] [--min-coverage MIN_COVERAGE] [--max-gaps MAX_GAPS] [--include-analysis]
+usage: run.py [-h] [--fasta FASTA] [--email EMAIL] [--output-path OUTPUT_PATH] [--blast BLAST] [--min-identity MIN_IDENTITY] [--max-evalue MAX_EVALUE] [--min-coverage MIN_COVERAGE] [--max-gaps MAX_GAPS] [--include-analysis]
                [--mode MODE]
 
 optional arguments:
