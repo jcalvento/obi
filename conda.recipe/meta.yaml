@@ -1,4 +1,4 @@
-{% set version = "1.0.1" %}
+{% set version = "1.0.2" %}
 
 package:
   name: obi
@@ -27,5 +27,6 @@ requirements:
     - iqtree =2.0.3
     - pytest =5.2.4
     - requests =2.23.0
+    - requests-toolbelt =0.9.1
     - blast =2.10.1
     - marshmallow =3.9.1

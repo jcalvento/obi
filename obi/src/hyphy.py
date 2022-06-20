@@ -5,6 +5,7 @@ from abc import abstractmethod
 from functools import reduce
 
 import requests
+from requests_toolbelt import MultipartEncoder
 
 
 class Hyphy:
@@ -123,15 +124,17 @@ class HyphyAPIError(RuntimeError):
 
 
 def upload(file_path):
-    # https://github.com/espebra/filebin#web-service
-    with open(file_path, "r") as f:
-        content = f.read()
-        response = requests.post(
-            url='https://filebin.net/',
-            data=content,
-            headers={'Content-Type': 'application/octet-stream', 'filename': f.name.split("/")[-1]}
-        )
-        link = response.json()['links'][0]['href']
-        html = requests.get(link).text
-        html_link = link + '?t='
-        return html[html.find(html_link):html.find(html_link) + len(html_link) + 8]
+    file = open(file_path, 'rb')
+    data = {"reqtype": "fileupload", "time": "1h", "fileToUpload": (file.name, file, 'application/fasta')}
+    encoder = MultipartEncoder(fields=data)
+    response = requests.post(
+        'https://litterbox.catbox.moe/resources/internals/api.php',
+        data=encoder,
+        headers={'Content-Type': encoder.content_type}
+    )
+    return response.text
+
+
+if __name__ == '__main__':
+    upload(
+        "/Users/julian/opt/miniconda3/envs/obi/lib/python3.8/site-packages/obi/results/P68871_HBB/nucleotide_alignment.fasta");

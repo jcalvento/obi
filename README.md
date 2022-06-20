@@ -105,12 +105,10 @@ Check the setup section before running your analysis
 - Upload: `anaconda upload /path/to/build.tar.bz2`
 
 
-## Colaborate with Obi project
+## Collaborate with Obi project
 
-The OBI project is open to contributions. Please contact the project manager Dr. Ana Julia Velez Rueda.
+The OBI project is open to contributions. Create a branch with your changes and open a pull request, so we can review it.
+All checks should pass before merging into main branch.
 
-National University of Quilmes, Roque Saenz Peña 352, B1876BXD, Bernal, Buenos Aires, Argentina
-
-Phone: + 54 11 43657100 ext 5657
-
-E-mail: avelezrueda@uvq.edu.ar
+## Questions and issues
+[Open an issue](https://github.com/jcalvento/obi/issues) with question and/or problems
