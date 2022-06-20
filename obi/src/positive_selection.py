@@ -30,12 +30,12 @@ class PositiveSelectionAnalyzer:
     def for_mode(cls, mode):
         return detect(lambda subclass: subclass.suits_mode(mode.lower()), cls.__subclasses__(), default=LocalAnalyzer)()
 
-    def analyse(self, results_dir, alignment_preparation_result, api_key=None, email=None):
+    def analyse(self, results_dir, alignment_preparation_result, email=None):
         self._validate_alignments(alignment_preparation_result, results_dir)
-        return self._run_analysis(results_dir, alignment_preparation_result, api_key, email)
+        return self._run_analysis(results_dir, alignment_preparation_result, email)
 
     @abstractmethod
-    def _run_analysis(self, results_dir, alignment_preparation_result, api_key, email):
+    def _run_analysis(self, results_dir, alignment_preparation_result, email):
         pass
 
     def _generate_report(self, alignment_preparation_result, hyphy_result, pdb_mappings, results_dir):
@@ -75,10 +75,8 @@ class LocalAnalyzer(PositiveSelectionAnalyzer):
     def suits_mode(cls, mode):
         return mode == cls.LOCAL_MODE
 
-    def _run_analysis(self, results_dir, alignment_preparation_result, api_key, email):
-        hyphy_result = Hyphy.local().run(
-            alignment_preparation_result.nucleotide_alignment_path, api_key=api_key, email=email, bootstrap=1000
-        )
+    def _run_analysis(self, results_dir, alignment_preparation_result, email):
+        hyphy_result = Hyphy.local().run(alignment_preparation_result.nucleotide_alignment_path)
 
         return self._process_hyphy_result_and_generate_report(alignment_preparation_result, hyphy_result, results_dir)
 
@@ -91,10 +89,8 @@ class RemoteAnalyzer(PositiveSelectionAnalyzer):
     def suits_mode(cls, mode):
         return mode == cls.REMOTE_MODE
 
-    def _run_analysis(self, results_dir, alignment_preparation_result, api_key, email):
-        hyphy_result = self._hyphy.run(
-            alignment_preparation_result.nucleotide_alignment_path, api_key=api_key, email=email, bootstrap=1000
-        )
+    def _run_analysis(self, results_dir, alignment_preparation_result, email):
+        hyphy_result = self._hyphy.run(alignment_preparation_result.nucleotide_alignment_path, email)
 
         with open(f"{results_dir}/datamonkey_response.json", "w") as f:
             f.write(json.dumps(hyphy_result, indent=2))

@@ -71,63 +71,31 @@ class TestHyphy:
     def test_it_runs_hyphy_generating_a_new_job_in_datamonkey_api(self):
         nucleotide_alignment_path = get_resource("nucleotide_alignment.fasta")
 
-        result = Hyphy.remote().run(nucleotide_alignment_path, "your-api-key", "juliancalvento@gmail.com")
+        result = Hyphy.remote().run(nucleotide_alignment_path, "juliancalvento@gmail.com")
 
         assert result == {
-            'id': '6028aa9c328ea41e07fe788d',
+            'id': '62b000b1925b0370fdb762ad',
             'status': 'queue',
-            'time_stamp': '2021-02-14T04:44:12.117Z',
-            'url': 'datamonkey.org/MEME/6028aa9c328ea41e07fe788d'
+            'mail': 'mail@mail.com',
+            'created': '2022-06-20T05:08:01.030Z',
         }
-
-    @mock.patch('obi.src.hyphy.RemoteHyphy._key_info')
-    def test_it_raises_an_error_when_api_key_is_expired(self, mock_key_info):
-        mock_key_info.return_value = {
-            "_id": "Your API Key",
-            "__v": 3,
-            "associated_job_ids": [
-                "datamonkey.org/FEL/5f0f0d95ba5dd5a981b52fbb",
-                "datamonkey.org/FEL/5f0f0da7ba5dd5a981b52fd3",
-                "datamonkey.org/FEL/5f0f0da8ba5dd5a981b52feb"
-            ],
-            "job_remaining": 0,
-            "job_request_made": 100,
-            "job_request_limit": 100,
-            "expires": "2020-08-04T14:03:26.431Z",
-            "created": "2020-07-15T14:04:16.881Z"
-        }
-        api_key = "6020736d27e5ee138cbb0123"
-
-        try:
-            Hyphy.remote().run("something.fasta", api_key, "email@mail.com")
-            fail()
-        except InvalidApiKeyError as e:
-            assert e.message == f"Key {api_key} expired, to get a new one http://datamonkey.org/apiKey"
-
-    @pytest.mark.vcr()
-    @pytest.mark.default_cassette("invalid_api_key.yaml")
-    def test_it_runs_hyphy_generating_a_new_job_in_datamonkey_api(self):
-        api_key = "somethinginvalid"
-
-        try:
-            Hyphy.remote().run("some/path.fasta", api_key, "mail@mail.com")
-            fail()
-        except HyphyAPIError as e:
-            assert e.message.startswith('Datamonkey API failed:')
-
-    def test_it_fails_when_api_key_is_not_present_for_remote_job(self):
-        try:
-            Hyphy.remote().run("some/path.fasta", None, "mail@mail.com")
-            fail()
-        except InvalidApiKeyError as e:
-            assert e.message == "API Key is required to submit a remote job"
 
     def test_it_fails_when_email_is_not_present_for_remote_job(self):
         try:
-            Hyphy.remote().run("some/path.fasta", "thekey", None)
+            Hyphy.remote().run("some/path.fasta", None)
             fail()
         except HyphyAPIError as e:
             assert e.message == "Email is required to submit a remote job"
+
+    @pytest.mark.vcr()
+    @pytest.mark.default_cassette("invalid_job.yaml")
+    def test_it_runs_hyphy_generating_a_new_job_in_datamonkey_api(self):
+        try:
+            Hyphy.remote().run(get_resource("alignment_preparation_result.json"), "mail@mail.com")
+            fail()
+        except HyphyAPIError as e:
+            assert e.message == 'There was an error submitting the job. Error: An unexpected error occured when ' \
+                                'parsing the sequence alignment!'
 
     @pytest.mark.vcr()
     @pytest.mark.default_cassette("job_done.yaml")
