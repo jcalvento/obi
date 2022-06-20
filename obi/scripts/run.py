@@ -54,9 +54,6 @@ def run():
                        '"local" if you want to run Hyphy locally, "remote" to use Datamonkey instead. Default: local',
         default=PositiveSelectionAnalyzer.LOCAL_MODE
     )
-    parser.add_argument(
-        "--api-key", help='Required when running in remote mode. To get one go to http://datamonkey.org/apiKey'
-    )
     args = parser.parse_args()
     results_dir = args.output_path or create_results_dir(args.fasta)
     blast = Blast(args.blast)
@@ -66,11 +63,9 @@ def run():
     )
     print(f"Init time: {datetime.datetime.now()}")
     try:
-        obi_1.run(
-            args.fasta, args.include_analysis, min_identity=float(args.min_identity),
-            max_evalue=float(args.max_evalue), min_coverage=float(args.min_coverage),
-            max_gaps=int(args.max_gaps), mode=args.mode, api_key=args.api_key
-        )
+        obi_1.run(args.fasta, args.include_analysis, min_identity=float(args.min_identity),
+                  max_evalue=float(args.max_evalue), min_coverage=float(args.min_coverage), max_gaps=int(args.max_gaps),
+                  mode=args.mode)
     except (BlastResultsError, HyphyError, InvalidEntrezIds) as e:
         print(e.message)
     print(f"Finish time: {datetime.datetime.now()}")

@@ -38,7 +38,7 @@ class Hyphy:
 
 
 class LocalHyphy(Hyphy):
-    def run(self, nucleotide_alignment_path, api_key=None, email=None, bootstrap=1000):
+    def run(self, nucleotide_alignment_path, email=None, bootstrap=1000):
         tree_path = self._generate_tree(nucleotide_alignment_path, bootstrap)
         self._hyphy(nucleotide_alignment_path, tree_path)
 
@@ -59,21 +59,27 @@ class LocalHyphy(Hyphy):
 class RemoteHyphy(Hyphy):
     DATAMONKEY_BASE_URL = "http://datamonkey.org/api/v1"
 
-    def run(self, nucleotide_alignment_path, api_key, email, bootstrap=None):
-        self._validate_params(api_key, email)
-        file_url = upload(nucleotide_alignment_path)
-        url = f'{self.DATAMONKEY_BASE_URL}/submit'
-        body = {
-            'api_key': api_key,
-            "method": "MEME",
-            "fastaLoc": file_url,
-            "mail": email,
-            "gencodeid": "Universal",
-            "fileExtension": "fasta"
-        }
-        response = requests.post(url, json=body)
+    def run(self, nucleotide_alignment_path, email, bootstrap=None):
+        self._validate_params(email)
+        file = self.__file(nucleotide_alignment_path)
+        data = {"gencodeid": "0", "mail": email, "files": (file.name, file, 'application/fasta')}
+        encoder = MultipartEncoder(fields=data)
+        response = requests.post(
+            'http://www.datamonkey.org/meme',
+            data=encoder,
+            headers={'Content-Type': encoder.content_type}
+        )
 
-        return response.json()
+        result = response.json()['analysis']
+        if not result.get('_id'):
+            raise HyphyAPIError(f"There was an error submitting the job. Error: {result.get('error')}")
+
+        return {
+            'id': result.get('_id'),
+            'mail': result.get('mail'),
+            'created': result.get('created'),
+            'status': result.get('status'),
+        }
 
     def job_result(self, results_dir, job_id):
         response = requests.get('http://datamonkey.org/api/v1/status', json={'method': 'MEME', 'id': job_id})
@@ -89,23 +95,12 @@ class RemoteHyphy(Hyphy):
         else:
             raise HyphyJobNotReady(f"Job {job_id} is not ready, status: {data['status']}. Try again later.")
 
-    def _key_info(self, api_key):
-        response = requests.post(f"{self.DATAMONKEY_BASE_URL}/keyinfo", {'api_key': api_key})
-
-        if response.status_code != 200:
-            raise HyphyAPIError(f"Datamonkey API failed: {response.text}")
-        return response.json()
-
-    def _validate_params(self, api_key, email):
-        if not api_key:
-            raise InvalidApiKeyError("API Key is required to submit a remote job")
-
+    def _validate_params(self, email):
         if not email:
             raise HyphyAPIError("Email is required to submit a remote job")
 
-        key_info = self._key_info(api_key)
-        if key_info["job_remaining"] == 0:
-            raise InvalidApiKeyError(f"Key {api_key} expired, to get a new one http://datamonkey.org/apiKey")
+    def __file(self, nucleotide_alignment_path):
+        return open(nucleotide_alignment_path, 'rb')
 
 
 class HyphyJobNotReady(RuntimeError):
@@ -121,15 +116,3 @@ class InvalidApiKeyError(RuntimeError):
 class HyphyAPIError(RuntimeError):
     def __init__(self, message):
         self.message = message
-
-
-def upload(file_path):
-    file = open(file_path, 'rb')
-    data = {"reqtype": "fileupload", "time": "1h", "fileToUpload": (file.name, file, 'application/fasta')}
-    encoder = MultipartEncoder(fields=data)
-    response = requests.post(
-        'https://litterbox.catbox.moe/resources/internals/api.php',
-        data=encoder,
-        headers={'Content-Type': encoder.content_type}
-    )
-    return response.text

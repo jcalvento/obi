@@ -13,22 +13,22 @@ class TestRemoteAnalyzer:
     @pytest.mark.vcr()
     @pytest.mark.default_cassette("submit_job.yaml")
     def test_creates_a_new_datamonkey_job(self, mocker):
-        mocker.patch('obi.src.hyphy.upload', return_value="hyphy.com/file")
+        alignment_file = open(get_resource("nucleotide_alignment.fasta"), 'rb')
+        mocker.patch('obi.src.hyphy.RemoteHyphy._RemoteHyphy__file', return_value=alignment_file)
         results_dir_path = results_dir()
         file = open(get_resource("/alignment_preparation_result.json"), 'r')
         data = json.load(file)
         alignment_preparation_result = AlignmentPreparationResultSchema().load(data)
-        api_key = "6020736d27e5ee138cbb0123"
         email = "mail@mail.com"
         analyser = PositiveSelectionAnalyzer.for_mode(PositiveSelectionAnalyzer.REMOTE_MODE)
 
-        result = analyser.analyse(results_dir_path, alignment_preparation_result, api_key=api_key, email=email)
+        result = analyser.analyse(results_dir_path, alignment_preparation_result, email=email)
 
         assert result == {
-          "time_stamp": "2021-02-14T04:44:12.117Z",
-          "id": "6028aa9c328ea41e07fe788d",
+          "id": "62b000b1925b0370fdb762ad",
           "status": "queue",
-          "url": "datamonkey.org/MEME/6028aa9c328ea41e07fe788d"
+          'mail': 'mail@mail.com',
+          'created': '2022-06-20T05:08:01.030Z',
         }
 
     @pytest.mark.vcr()
@@ -39,7 +39,7 @@ class TestRemoteAnalyzer:
         data = json.load(file)
         alignment_preparation_result = AlignmentPreparationResultSchema().load(data)
         analyser = PositiveSelectionAnalyzer.for_mode(PositiveSelectionAnalyzer.REMOTE_MODE)
-        job_id = "6028aa9c328ea41e07fe788d"
+        job_id = "62b000b1925b0370fdb762ad"
 
         try:
             analyser.resume(results_dir_path, alignment_preparation_result)

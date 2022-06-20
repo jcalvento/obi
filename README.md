@@ -35,7 +35,7 @@ To run the whole analysis or first part depending on the arguments, you can use 
 
 ```commandline
 usage: obi run [-h] [--fasta FASTA] [--email EMAIL] [--output-path OUTPUT_PATH] [--blast BLAST] [--min-identity MIN_IDENTITY] [--max-evalue MAX_EVALUE] [--min-coverage MIN_COVERAGE]
-               [--max-gaps MAX_GAPS] [--include-analysis] [--mode MODE] [--api-key API_KEY]
+               [--max-gaps MAX_GAPS] [--include-analysis] [--mode MODE]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -53,7 +53,6 @@ optional arguments:
   --max-gaps MAX_GAPS   Maximum number of gaps permitted for Blast results. Default: 6
   --include-analysis    If present, runs positive selection analysis, which includes running Hyphy and getting final results. If not present, result includes until nucleotide alignment
   --mode MODE           Only used when --include-analysis is present. "local" if you want to run Hyphy locally, "remote" to use Datamonkey instead. Default: local
-  --api-key API_KEY     Required when running in remote mode. To get one go to http://datamonkey.org/apiKey
 ```
 
 For development env use `python obi/scripts/run.py`  
@@ -62,14 +61,13 @@ For development env use `python obi/scripts/run.py`
 To run only the analysis (if previous step didn't include it) use `obi\ analysis`
 
 ```commandline
-usage: obi analysis [-h] [--input-path INPUT_PATH] [--mode MODE] [--api-key API_KEY] [--email EMAIL]
+usage: obi analysis [-h] [--input-path INPUT_PATH] [--mode MODE] [--email EMAIL]
 
 optional arguments:
   -h, --help            show this help message and exit
   --input-path INPUT_PATH
                         Path of alignment preparation result
   --mode MODE           "local" if you want to run Hyphy locally, "remote" to use Datamonkey instead. Default: local
-  --api-key API_KEY     Required when running in remote mode. To get one go to http://datamonkey.org/apiKey
   --email EMAIL         Required when running in remote mode. You will get notified once job is done
 ```
 

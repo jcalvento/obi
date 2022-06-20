@@ -13,18 +13,13 @@ def analysis():
         default=PositiveSelectionAnalyzer.LOCAL_MODE
     )
     parser.add_argument(
-        "--api-key", help='Required when running in remote mode. To get one go to http://datamonkey.org/apiKey'
-    )
-    parser.add_argument(
         "--email", help='Required when running in remote mode. You will get notified once job is done'
     )
     args = parser.parse_args()
     with open(args.input_path + "/alignment_preparation_result.json", 'r') as file_content:
         data = json.load(file_content)
         alignment_preparation_result = AlignmentPreparationResultSchema().load(data)
-        PositiveSelectionAnalyzer.for_mode(args.mode).analyse(
-            args.input_path, alignment_preparation_result, args.api_key, args.email
-        )
+        PositiveSelectionAnalyzer.for_mode(args.mode).analyse(args.input_path, alignment_preparation_result, args.email)
 
 
 if __name__ == "__main__":

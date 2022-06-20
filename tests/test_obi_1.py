@@ -46,7 +46,7 @@ class TestObi:
                                                max_evalue=None, min_coverage=None, max_gaps=None)
         mock_alignment_preparation.assert_called_once()
         mock_positive_selection.assert_called_once_with(
-            results_dir(), alignment_preparation_result, api_key=None, email=email
+            results_dir(), alignment_preparation_result, email=email
         )
 
     @mock.patch('obi.src.blast.Blast.run')
@@ -60,9 +60,9 @@ class TestObi:
         email = "test@email.com"
         uniprot_pdb_csv_path = "uniprot_csv.csv"
 
-        Obi(blast, email, uniprot_pdb_csv_path, results_dir()).run(
-            input_fasta, include_analysis=False, min_identity=0.5, max_evalue=0.003, min_coverage=95, max_gaps=20
-        )
+        Obi(blast, email, uniprot_pdb_csv_path, results_dir()).run(input_fasta, include_analysis=False,
+                                                                   min_identity=0.5, max_evalue=0.003, min_coverage=95,
+                                                                   max_gaps=20)
 
         mock_blast_run.assert_called_once_with(
             input_fasta, results_dir(), min_identity=0.5, max_evalue=0.003, min_coverage=95, max_gaps=20
