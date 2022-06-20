@@ -133,8 +133,3 @@ def upload(file_path):
         headers={'Content-Type': encoder.content_type}
     )
     return response.text
-
-
-if __name__ == '__main__':
-    upload(
-        "/Users/julian/opt/miniconda3/envs/obi/lib/python3.8/site-packages/obi/results/P68871_HBB/nucleotide_alignment.fasta");

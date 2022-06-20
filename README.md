@@ -94,7 +94,7 @@ For development env use `python obi/scripts/resume_analysis.py`
 An input file example can be found in the `examples` directory. The input fasta file, containing the Human Hemoglobing, can be analyzed by running:
 
 ```commandline
-obi\ run --fasta /home/ana/user/examples/P68871_HBB/hb_homo_sapiens.fasta --mode remote --api-key userAPIKEY --email user@gmail.com
+obi\ run --fasta /home/ana/user/examples/P68871_HBB/hb_homo_sapiens.fasta --mode local --email user@gmail.com
 ```
 
 Check the setup section before running your analysis
